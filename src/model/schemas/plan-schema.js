@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { PLAN_TYPE } from "../../constants/plan-constant";
+import { PLAN_TYPE } from "../../constants/plan-constant.js";
 
 export const planSchema = new mongoose.Schema({
     name: {
