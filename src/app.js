@@ -2,11 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import { xssSanitizer } from "./middlewares/sanitizer-middleware.js";
 import v1UsuarioRoutes from "./routes/v1/usuario-routes.js";
+import { connectMongo } from "./config/mongo-config.js";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
+
+connectMongo();
 
 app.use(express.json());
 
@@ -20,6 +23,7 @@ app.listen(port, () => {
 });
 
 
-//TODO: conectar a la base de datos
 //TODO: probar crear un usuario
+//TODO: validar datos del usuario antes de crearlo
+//TODO: validar datos del plan antes de crearlo
 //TODO: conectar a REDIS
