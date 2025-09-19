@@ -23,7 +23,6 @@ app.listen(port, () => {
 });
 
 
-//TODO: probar crear un usuario
 //TODO: validar datos del usuario antes de crearlo
 //TODO: validar datos del plan antes de crearlo
 //TODO: manejar errores de la base de datos
