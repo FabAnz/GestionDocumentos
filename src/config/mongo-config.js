@@ -7,7 +7,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 export const connectMongo = async () => {
     try {
-        mongoose.connect(MONGO_URI, {})
+        await mongoose.connect(MONGO_URI, {})
         console.log('Levanto Mongo')
     } catch (err) {
         console.log('Hubo un error en la conexion de mongo', err);
