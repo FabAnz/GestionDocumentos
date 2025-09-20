@@ -9,7 +9,31 @@ const usuarioRepository = {
             delete nuevoUsuario._doc.password;
             return nuevoUsuario;
         } catch (error) {
-            console.log('No se pudo crear el usuario en la base de datos', error);
+            throw error; // Re-lanzar el error para que se propague
+        }
+    },
+
+    async updateUsuario(id, data) {
+        try {
+            const usuarioActualizado = await Usuario.findByIdAndUpdate(
+                id, 
+                data, 
+                { new: true, runValidators: true }
+            );
+            if (usuarioActualizado) {
+                delete usuarioActualizado._doc.password;
+            }
+            return usuarioActualizado;
+        } catch (error) {
+            throw error; // Re-lanzar el error para que se propague
+        }
+    },
+
+    async deleteUsuario(id) {
+        try {
+            return await Usuario.findByIdAndDelete(id);
+        } catch (error) {
+            throw error; // Re-lanzar el error para que se propague
         }
     }
 }

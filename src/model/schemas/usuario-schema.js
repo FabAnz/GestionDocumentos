@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
-export const usuarioSchema = new mongoose.Schema({
+const usuarioSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
         lowercase: true,
         trim: true,
         match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Ingrese un email valido"],
@@ -25,6 +24,10 @@ export const usuarioSchema = new mongoose.Schema({
     plan: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Plan",
-        required: true,
+        required: false,
     },
 }, { timestamps: true });
+
+usuarioSchema.index({ email: 1 }, { unique: true });
+
+export default usuarioSchema;

@@ -5,5 +5,4 @@ export const validateCreateUsuario = Joi.object({
     password: Joi.string().required(),
     nombre: Joi.string().required(),
     apellido: Joi.string().required(),
-    plan: Joi.string().required(),
 });

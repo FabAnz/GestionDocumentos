@@ -10,6 +10,14 @@ export const createUsuario = async (req, res) => {
         const nuevoUsuario = await usuarioService.createUsuarioConPlan(usuario);
         res.status(201).json(nuevoUsuario);
     } catch (error) {
+        // Manejar error de email duplicado
+        if (error.code === 11000) {
+            return res.status(400).json({ 
+                message: "El email ya está registrado" 
+            });
+        }
+        
+        // Otros errores
         res.status(500).json({ message: error.message });
     }
 }

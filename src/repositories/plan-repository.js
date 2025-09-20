@@ -7,7 +7,7 @@ const planRepository = {
             const newPlan = new Plan(data);
             return await newPlan.save();
         } catch (error) {
-            console.log('No se pudo crear el plan en la base de datos', error);
+            throw error; // Re-lanzar el error para que se propague
         }
     }
 }
