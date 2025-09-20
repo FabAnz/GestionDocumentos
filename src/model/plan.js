@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
-import { planSchema } from "./schemas/plan-schema.js";
+import planBaseSchema from "./schemas/plan-base-schema.js";
+import planPlusSchema from "./schemas/plan-plus-schema.js";
 
-const plan = mongoose.model("Plan", planSchema, "planes");
+// Crear el modelo base
+const Plan = mongoose.model("Plan", planBaseSchema, "planes");
 
-export default plan;
+// Crear los discriminadores para cada tipo de plan
+const PlanPlus = Plan.discriminator("PlanPlus", planPlusSchema);
+
+export default Plan;
+export { PlanPlus };

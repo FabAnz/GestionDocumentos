@@ -11,13 +11,13 @@ const usuarioService = {
             // 1. Crear el usuario sin plan
             newUsuario = await usuarioRepository.createUsuario(data);
 
-            // 2. Crear el plan
+            // 2. Crear el plan Plus
             const planData = {
-                name: PLAN_TYPE.PLUS,
-                limiteRespuestasIA: 10,
-                limiteInteraccionesConDocumentos: 10,
+                nombre: PLAN_TYPE.PLUS,
+                respuestaRestantesIA: 10,
+                interaccionesConDocumentosRestantes: 10,
             }
-            const newPlan = await planRepository.createPlan(planData);
+            const newPlan = await planRepository.createPlanPlus(planData);
 
             // 3. Actualizar el usuario con el ID del plan
             const usuarioActualizado = await usuarioRepository.updateUsuario(

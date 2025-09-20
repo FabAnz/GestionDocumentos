@@ -21,8 +21,3 @@ app.use("/api/v1/usuarios", v1UsuarioRoutes);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-
-//TODO: validar datos del plan antes de crearlo
-//TODO: manejar errores de la base de datos
-//TODO: conectar a REDIS

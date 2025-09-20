@@ -12,7 +12,7 @@ export const createUsuario = async (req, res) => {
     } catch (error) {
         // Manejar error de email duplicado
         if (error.code === 11000) {
-            return res.status(400).json({ 
+            return res.status(409).json({ 
                 message: "El email ya está registrado" 
             });
         }
