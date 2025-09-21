@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import usuarioService from "../services/usuario-service.js";
+import jwt from "jsonwebtoken";
+import usuarioRepository from "../repositories/usuario-repository.js";
 
 export const createUsuario = async (req, res) => {
     try {
@@ -18,6 +20,34 @@ export const createUsuario = async (req, res) => {
         }
         
         // Otros errores
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const loginUsuario = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const usuario = await usuarioRepository.getUserByEmail(email);
+        if (!usuario) {
+            return res.status(401).json({ message: "Usuario y/o contraseña incorrectos" });
+        }
+        const passwordMatch = await bcrypt.compare(password, usuario.password);
+        if (!passwordMatch) {
+            return res.status(401).json({ message: "Usuario y/o contraseña incorrectos" });
+        }
+        const token = jwt.sign({ id: usuario._id, email: usuario.email }, process.env.JWT_SECRET);
+        res.status(200).json({ 
+            token, 
+            usuario: {
+                id: usuario._id,
+                email: usuario.email,
+                nombre: usuario.nombre,
+                plan: {
+                    id: usuario.plan._id,
+                    nombre: usuario.plan.nombre                }
+            }
+        });
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 }

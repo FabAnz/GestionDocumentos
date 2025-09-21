@@ -46,3 +46,23 @@ export const validateCreateUsuario = Joi.object({
             'any.required': 'El apellido es obligatorio'
         })
 });
+
+export const validateLoginUsuario = Joi.object({
+    email: Joi.string()
+        .email({ tlds: { allow: false } })
+        .max(254)
+        .required()
+        .messages({
+            'string.base': 'El email debe ser texto',
+            'string.empty': 'El email no puede estar vacío',
+            'string.email': 'Debe proporcionar un email válido',
+            'string.max': 'El email no puede tener más de {{#limit}} caracteres',
+            'any.required': 'El email es obligatorio'
+        }),
+    password: Joi.string()
+        .required()
+        .messages({
+            'string.empty': 'La contraseña no puede estar vacía',
+            'any.required': 'La contraseña es obligatoria'
+        })
+});

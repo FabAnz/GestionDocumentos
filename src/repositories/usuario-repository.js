@@ -35,7 +35,20 @@ const usuarioRepository = {
         } catch (error) {
             throw error; // Re-lanzar el error para que se propague
         }
+    },
+
+    async getUserByEmail(email) {
+        try {
+            const usuario = await Usuario.findOne({ email }).populate('plan');
+            if (!usuario) {
+                return null;
+            }
+            return usuario;
+        } catch (error) {
+            throw error; // Re-lanzar el error para que se propague
+        }
     }
+
 }
 
 export default usuarioRepository;
