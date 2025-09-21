@@ -19,7 +19,7 @@ const usuarioRepository = {
                 id, 
                 data, 
                 { new: true, runValidators: true }
-            );
+            ).populate('plan');
             if (usuarioActualizado) {
                 delete usuarioActualizado._doc.password;
             }
@@ -43,6 +43,19 @@ const usuarioRepository = {
             if (!usuario) {
                 return null;
             }
+            return usuario;
+        } catch (error) {
+            throw error; // Re-lanzar el error para que se propague
+        }
+    },
+
+    async getUserById(id) {
+        try {
+            const usuario = await Usuario.findById(id).populate('plan');
+            if (!usuario) {
+                return null;
+            }
+            delete usuario._doc.password;
             return usuario;
         } catch (error) {
             throw error; // Re-lanzar el error para que se propague

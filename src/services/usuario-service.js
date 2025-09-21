@@ -37,6 +37,25 @@ const usuarioService = {
             }
             throw error;
         }
+    },
+
+    async upgradePlan(usuario) {
+        try {
+            const planData = {
+                nombre: PLAN_TYPE.PREMIUM,
+            }
+            const newPlan = await planRepository.createPlanPremium(planData);
+            const usuarioActualizado = await usuarioRepository.updateUsuario(
+                usuario._id, 
+                { plan: newPlan._id }
+            );
+            await planRepository.deletePlan(usuario.plan._id);
+            return usuarioActualizado;
+        }
+        catch (error) {
+            await planRepository.deletePlan(newPlan._id);
+            throw error;
+        }
     }
 }
 

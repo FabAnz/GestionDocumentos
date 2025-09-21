@@ -51,3 +51,12 @@ export const loginUsuario = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const upgradePlan = async (req, res) => {
+    try {
+        const updatedUsuario = await usuarioService.upgradePlan(req.usuarioCompleto);
+        res.status(200).json(updatedUsuario);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
