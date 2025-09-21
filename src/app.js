@@ -21,3 +21,7 @@ app.use("/api/v1/usuarios", v1UsuarioRoutes);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
+
+//TODO: Crear categorias en la bd
+//TODO: Crear documentos
+//TODO: Mandar documentos a RAG
