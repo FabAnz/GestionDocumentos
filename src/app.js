@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { xssSanitizer } from "./middlewares/sanitizer-middleware.js";
 import v1UsuarioRoutes from "./routes/v1/usuario-routes.js";
+import v1DocumentoRoutes from "./routes/v1/documento-routes.js";
 import { connectMongo } from "./config/mongo-config.js";
 
 dotenv.config();
@@ -17,10 +18,11 @@ app.use(express.json());
 app.use(xssSanitizer);
 
 app.use("/api/v1/usuarios", v1UsuarioRoutes);
+app.use("/api/v1/documentos", v1DocumentoRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-//TODO: Crear documentos
+//TODO: Agregar documentos a los usuarios (usar un servicio para agregar documentos a los usuarios)
 //TODO: Mandar documentos a RAG
