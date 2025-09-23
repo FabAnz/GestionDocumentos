@@ -24,5 +24,4 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
-//TODO: Agregar documentos a los usuarios (usar un servicio para agregar documentos a los usuarios)
 //TODO: Mandar documentos a RAG

@@ -9,23 +9,7 @@ const documentoSchema = new mongoose.Schema({
     categorias: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "Categoria",
-        required: [true, "Las categorías son obligatorias"],
-        validate: {
-            validator: async function (categorias) {
-                if (!categorias || categorias.length === 0) {
-                    return false;
-                }
-
-                // Verificar que todas las categorías existen
-                const Categoria = mongoose.model('Categoria');
-                const categoriasExistentes = await Categoria.countDocuments({
-                    _id: { $in: categorias }
-                });
-
-                return categoriasExistentes === categorias.length;
-            },
-            message: "Una o más categorías no existen en la base de datos"
-        }
+        required: [true, "Las categorías son obligatorias"]
     },
     contenido: {
         type: String,

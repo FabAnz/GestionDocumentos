@@ -1,20 +1,17 @@
-import categoriaRepository from "../repositories/categotia-repository.js";
-import documentoRepository from "../repositories/documento-repository.js";
+import validationService from "../services/validation-service.js";
+import documentoService from "../services/documento-service.js";
 
 export const createDocumento = async (req, res) => {
     try {
         const { titulo, categorias, contenido } = req.body;
 
         // Validar que todas las categorías existen
-        const categoriasExistentes = await categoriaRepository.findCategoriasByIds(categorias);
+        const validacionCategorias = await validationService.validateCategoriasExist(categorias);
 
-        if (categoriasExistentes.length !== categorias.length) {
+        if (!validacionCategorias.isValid) {
             return res.status(400).json({
-                message: "Una o más categorías no existen",
-                categoriasValidas: categoriasExistentes.map(cat => ({
-                    id: cat._id,
-                    nombre: cat.nombre
-                }))
+                message: validacionCategorias.message,
+                categoriasValidas: validacionCategorias.categoriasValidas
             });
         }
 
@@ -24,7 +21,7 @@ export const createDocumento = async (req, res) => {
             contenido
         };
 
-        const documentoGuardado = await documentoRepository.createDocumento(documentoData);
+        const documentoGuardado = await documentoService.createDocumento(documentoData, req.user.id);
 
         res.status(201).json(documentoGuardado);
 
@@ -38,34 +35,6 @@ export const createDocumento = async (req, res) => {
             });
         }
 
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const getDocumentos = async (req, res) => {
-    try {
-        const documentos = await documentoRepository.getAllDocumentos();
-
-        res.status(200).json(documentos);
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-export const getDocumentoById = async (req, res) => {
-    try {
-        const { id } = req.params;
-        
-        const documento = await documentoRepository.getDocumentoById(id)
-
-        if (!documento) {
-            return res.status(404).json({ message: "Documento no encontrado" });
-        }
-
-        res.status(200).json(documento);
-
-    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };

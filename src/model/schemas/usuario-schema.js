@@ -32,6 +32,11 @@ const usuarioSchema = new mongoose.Schema({
         ref: "Plan",
         required: false,
     },
+    documentos: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Documento",
+        required: false,
+    },
 }, { timestamps: true });
 
 usuarioSchema.index({ email: 1 }, { unique: true });

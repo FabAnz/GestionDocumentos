@@ -16,6 +16,10 @@ const documentoRepository = {
     async getAllDocumentos() {
         const documentos = await Documento.find().populate('categorias');
         return documentos;
+    },
+
+    async deleteDocumento(id) {
+        await Documento.findByIdAndDelete(id);
     }
 }
 
