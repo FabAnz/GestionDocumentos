@@ -15,11 +15,16 @@ const documentoSchema = new mongoose.Schema({
         type: String,
         required: [true, "El contenido es obligatorio"],
         maxlength: [10000, "El contenido no puede tener más de 10000 caracteres"]
+    },
+    usuario: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Usuario",
+        required: [true, "El usuario es obligatorio"]
     }
 }, {
     timestamps: true
 });
 
-documentoSchema.index({ titulo: 1 }, { unique: true });
+documentoSchema.index({ titulo: 1, usuario: 1 }, { unique: true });
 
 export default documentoSchema;

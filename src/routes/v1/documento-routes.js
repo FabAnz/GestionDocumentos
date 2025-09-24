@@ -4,11 +4,13 @@ import { validateRequest } from "../../middlewares/validation-middleware.js";
 import { validateCreateDocumento } from "../../validations/validation-documento.js";
 import reqValidate from "../../constants/request-validation.js";
 import { createDocumento } from "../../controllers/documento-controller.js";
+import { limiteDocumentos } from "../../middlewares/limite-middleware.js";
 
 const routes = express.Router();
 
 routes.use(authMiddleware);
 
-routes.post("/", validateRequest(validateCreateDocumento, reqValidate.BODY), createDocumento);
+routes.post("/", limiteDocumentos, validateRequest(validateCreateDocumento, reqValidate.BODY), createDocumento);
 
 export default routes;
+ //TODO: Falta restar el limite de interacciones con documentos en las modificaciones de documentos

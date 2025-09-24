@@ -4,6 +4,7 @@ import documentoService from "../services/documento-service.js";
 export const createDocumento = async (req, res) => {
     try {
         const { titulo, categorias, contenido } = req.body;
+        const userId = req.user.id;
 
         // Validar que todas las categorías existen
         const validacionCategorias = await validationService.validateCategoriasExist(categorias);
@@ -18,10 +19,11 @@ export const createDocumento = async (req, res) => {
         const documentoData = {
             titulo,
             categorias,
-            contenido
+            contenido,
+            usuario: userId
         };
 
-        const documentoGuardado = await documentoService.createDocumento(documentoData, req.user.id);
+        const documentoGuardado = await documentoService.createDocumento(documentoData);
 
         res.status(201).json(documentoGuardado);
 
@@ -33,6 +35,11 @@ export const createDocumento = async (req, res) => {
                 message: "Error de validación",
                 errors: errores
             });
+        }
+
+        // Manejar error de limite de interacciones con documentos
+        if (error.message === "LIMITE_ALCANZADO") {
+            return res.status(403).json({ message: "Has alcanzado el límite de interacciones con documentos, para continuar con la interacción con documentos, debes actualizar tu plan" });
         }
 
         // Manejar error de titulo duplicado

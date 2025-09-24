@@ -1,26 +1,50 @@
 import documentoRepository from "../repositories/documento-repository.js";
+import planRepository from "../repositories/plan-repository.js";
 import usuarioRepository from "../repositories/usuario-repository.js";
 import fetchService from "./fetch-service.js";
 import dotenv from "dotenv";
+import { PLAN_TYPE } from "../constants/plan-constant.js";
 
 dotenv.config();
 
 const documentoService = {
 
-    async createDocumento(documentoData, usuarioId) {
+    async createDocumento(documentoData) {
         let documento = null;
         const url = process.env.RAG_URL;
-        console.log(url);
         try {
+            // Validar límites
+            const usuario = await usuarioRepository.getUserById(documentoData.usuario);
+            const { _id, nombre, interaccionesConDocumentosRestantes } = usuario.plan;
+
+
+            if (nombre === PLAN_TYPE.PLUS && interaccionesConDocumentosRestantes <= 0) {
+                throw new Error("LIMITE_ALCANZADO");
+            }
+
+            // Crear documento
             documento = await documentoRepository.createDocumento(documentoData);
-            const usuario = await usuarioRepository.getUserById(usuarioId);
+
+            // Actualizar usuario
             await usuarioRepository.updateUsuario(
-                usuarioId,
+                usuario._id,
                 { documentos: [...usuario.documentos, documento._id] }
             );
+
+
+            // Enviar a RAG
+            const url = process.env.RAG_URL;
             const response = await fetchService.post(url, documento);
-            //const response = await fetchService.post("https://n8n-personal.fantunez.com/webhook/c0b289b8-36dd-4a30-8d39-8a8a30994ca4", documento);
             console.log(response);
+
+            // Decrementar interacciones
+            if (nombre === PLAN_TYPE.PLUS) {
+                await planRepository.updatePlanPlus(
+                    _id,
+                    { interaccionesConDocumentosRestantes: interaccionesConDocumentosRestantes - 1 }
+                );
+            }
+
             return documento;
         } catch (error) {
             // Si falla la actualización del usuario, eliminar el documento creado

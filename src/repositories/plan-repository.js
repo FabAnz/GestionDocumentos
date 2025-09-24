@@ -26,6 +26,14 @@ const planRepository = {
         } catch (error) {
             throw error; // Re-lanzar el error para que se propague
         }
+    },
+
+    async updatePlanPlus(id, data) {
+        try {
+            return await PlanPlus.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+        } catch (error) {
+            throw error; // Re-lanzar el error para que se propague
+        }
     }
 }
 
