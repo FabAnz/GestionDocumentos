@@ -28,12 +28,5 @@ export const validateCreateDocumento = Joi.object({
             'string.empty': 'El contenido no puede estar vacío',
             'string.max': 'El contenido no puede tener más de {{#limit}} caracteres',
             'any.required': 'El contenido es obligatorio'
-        }),
-    usuario: Joi.string()
-        .required()
-        .messages({
-            'string.base': 'El usuario debe ser texto',
-            'string.empty': 'El usuario no puede estar vacío',
-            'any.required': 'El usuario es obligatorio'
         })
 });
