@@ -13,8 +13,8 @@ const documentoRepository = {
         return documento;
     },
 
-    async getAllDocumentos() {
-        const documentos = await Documento.find().populate('categorias');
+    async getAllDocumentos(userId) {
+        const documentos = await Documento.find({ usuario: userId }).populate('categorias');
         return documentos;
     },
 

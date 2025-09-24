@@ -1,5 +1,6 @@
 import validationService from "../services/validation-service.js";
 import documentoService from "../services/documento-service.js";
+import documentoRepository from "../repositories/documento-repository.js";
 
 export const createDocumento = async (req, res) => {
     try {
@@ -50,6 +51,19 @@ export const createDocumento = async (req, res) => {
         }
         
         // Otros errores
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getDocumentos = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const documentos = await documentoRepository.getAllDocumentos(userId);
+        if(!documentos || documentos.length === 0) {
+            return res.status(404).json({ message: "No se encontraron documentos" });
+        }
+        res.status(200).json(documentos);
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
