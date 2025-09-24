@@ -35,6 +35,14 @@ export const createDocumento = async (req, res) => {
             });
         }
 
+        // Manejar error de titulo duplicado
+        if (error.code === 11000) {
+            return res.status(409).json({ 
+                message: "El titulo ya está registrado" 
+            });
+        }
+        
+        // Otros errores
         res.status(500).json({ message: error.message });
     }
 };

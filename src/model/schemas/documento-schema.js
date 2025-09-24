@@ -20,4 +20,6 @@ const documentoSchema = new mongoose.Schema({
     timestamps: true
 });
 
+documentoSchema.index({ titulo: 1 }, { unique: true });
+
 export default documentoSchema;
