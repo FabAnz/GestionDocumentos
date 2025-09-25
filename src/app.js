@@ -24,6 +24,8 @@ app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
 
+//TODO: Eliminar archivos del RAG
+
 //En fase final
 //TODO: Se debe crear un workflow en n8n por usuario
 //TODO: Ponerle seguridad al webhook de n8n

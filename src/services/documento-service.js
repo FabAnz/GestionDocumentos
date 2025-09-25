@@ -7,7 +7,8 @@ import { PLAN_TYPE } from "../constants/plan-constant.js";
 import { badRequestError } from "../errors/400-error.js";
 
 dotenv.config();
-const url = process.env.RAG_URL;
+const urlCrearModificar = process.env.RAG_URL_CREAR_MODIFICAR;
+const urlEliminar = process.env.RAG_URL_ELIMINAR;
 
 const documentoService = {
 
@@ -34,7 +35,7 @@ const documentoService = {
 
 
             // Enviar a RAG
-            const response = await fetchService.post(url, documento);
+            const response = await fetchService.post(urlCrearModificar, documento);
             console.log(response);
 
             // Decrementar interacciones
@@ -44,7 +45,6 @@ const documentoService = {
                     { interaccionesConDocumentosRestantes: interaccionesConDocumentosRestantes - 1 }
                 );
             }
-
             return documento;
         } catch (error) {
             // Si falla la actualización del usuario, eliminar el documento creado
@@ -63,14 +63,13 @@ const documentoService = {
         let documento = null;
         try {
             documento = await documentoRepository.getDocumentoById(idDocumento, userId);
-            console.log("documento", documento);
             if (!documento) {
                 throw badRequestError("No se encontró el documento");
             }
             const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
 
             // Enviar a RAG
-            const response = await fetchService.post(url, documentoActualizado);
+            const response = await fetchService.post(urlCrearModificar, documentoActualizado);
             console.log(response);
 
             return documentoActualizado;
@@ -81,6 +80,28 @@ const documentoService = {
                     await documentoRepository.updateDocumento(idDocumento, documento, userId);
                 } catch (updateError) {
                     console.error('Error al restaurar documento tras fallo en actualización:', updateError);
+                }
+            }
+            throw error;
+        }
+    },
+
+    async deleteDocumento(idDocumento, userId) {
+        let documento = null;
+        try {
+            documento = await documentoRepository.deleteDocumento(idDocumento, userId);
+
+            //Eliminar del RAG
+            console.log(idDocumento);
+            const response = await fetchService.put(urlEliminar, { idDocumento });
+            console.log(response);
+
+        } catch (error) {
+            if (documento && documento._id) {
+                try {
+                    await documentoRepository.createDocumento(documento);
+                } catch (createError) {
+                    console.error('Error al crear documento tras fallo en eliminación:', createError);
                 }
             }
             throw error;
