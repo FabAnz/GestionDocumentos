@@ -118,7 +118,7 @@ export const updateDocumento = async (req, res) => {
         if (data.categorias) documentoData.categorias = data.categorias;
         if (data.contenido) documentoData.contenido = data.contenido;
 
-        const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
+        const documentoActualizado = await documentoService.updateDocumento(idDocumento, documentoData, userId);
 
         res.status(200).json(documentoActualizado);
 

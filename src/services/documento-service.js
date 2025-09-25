@@ -4,14 +4,15 @@ import usuarioRepository from "../repositories/usuario-repository.js";
 import fetchService from "./fetch-service.js";
 import dotenv from "dotenv";
 import { PLAN_TYPE } from "../constants/plan-constant.js";
+import { badRequestError } from "../errors/400-error.js";
 
 dotenv.config();
+const url = process.env.RAG_URL;
 
 const documentoService = {
 
     async createDocumento(documentoData) {
         let documento = null;
-        const url = process.env.RAG_URL;
         try {
             // Validar límites
             const usuario = await usuarioRepository.getUserById(documentoData.usuario);
@@ -33,7 +34,6 @@ const documentoService = {
 
 
             // Enviar a RAG
-            const url = process.env.RAG_URL;
             const response = await fetchService.post(url, documento);
             console.log(response);
 
@@ -53,6 +53,34 @@ const documentoService = {
                     await documentoRepository.deleteDocumento(documento._id);
                 } catch (deleteError) {
                     console.error('Error al eliminar documento tras fallo en actualización de usuario:', deleteError);
+                }
+            }
+            throw error;
+        }
+    },
+
+    async updateDocumento(idDocumento, documentoData, userId) {
+        let documento = null;
+        try {
+            documento = await documentoRepository.getDocumentoById(idDocumento, userId);
+            console.log("documento", documento);
+            if (!documento) {
+                throw badRequestError("No se encontró el documento");
+            }
+            const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
+
+            // Enviar a RAG
+            const response = await fetchService.post(url, documentoActualizado);
+            console.log(response);
+
+            return documentoActualizado;
+        } catch (error) {
+            // Si falla la actualización restaurar el documento
+            if (documento && documento._id) {
+                try {
+                    await documentoRepository.updateDocumento(idDocumento, documento, userId);
+                } catch (updateError) {
+                    console.error('Error al restaurar documento tras fallo en actualización:', updateError);
                 }
             }
             throw error;
