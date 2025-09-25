@@ -87,3 +87,74 @@ export const getDocumentoById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const updateDocumento = async (req, res) => {
+    try {
+        const idDocumento = req.params.id;
+        const data = req.body;
+        const userId = req.user.id;
+
+        // Validar que el body no esté vacío
+        if (!data || Object.keys(data).length === 0) {
+            return res.status(400).json({
+                message: "Debe enviar al menos un campo para actualizar"
+            });
+        }
+
+        // Validar que todas las categorías existen (si se envían)
+        if (data.categorias) {
+            const validacionCategorias = await validationService.validateCategoriasExist(data.categorias);
+            if (!validacionCategorias.isValid) {
+                return res.status(400).json({
+                    message: validacionCategorias.message,
+                    categoriasValidas: validacionCategorias.categoriasValidas
+                });
+            }
+        }
+
+        // Construir objeto con solo los campos enviados
+        const documentoData = {};
+        if (data.titulo) documentoData.titulo = data.titulo;
+        if (data.categorias) documentoData.categorias = data.categorias;
+        if (data.contenido) documentoData.contenido = data.contenido;
+
+        const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
+
+        res.status(200).json(documentoActualizado);
+
+    } catch (error) {
+        // Manejar errores de validación de Mongoose
+        if (error.name === 'ValidationError') {
+            const errores = Object.values(error.errors).map(err => err.message);
+            return res.status(400).json({
+                message: "Error de validación",
+                errors: errores
+            });
+        }
+
+        // Manejar error de bad request
+        if (error.statusCode === 400) {
+            return res.status(400).json({ message: error.message });
+        }
+
+        // Manejar error de permisos
+        if (error.statusCode === 403) {
+            return res.status(403).json({ message: error.message });
+        }
+
+        // Manejar error de documento no encontrado
+        if (error.statusCode === 404) {
+            return res.status(404).json({ message: error.message });
+        }
+
+        // Manejar error de titulo duplicado
+        if (error.code === 11000) {
+            return res.status(409).json({
+                message: "El titulo ya está registrado"
+            });
+        }
+
+        // Otros errores
+        res.status(500).json({ message: error.message });
+    }
+};
