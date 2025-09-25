@@ -30,3 +30,13 @@ export const validateCreateDocumento = Joi.object({
             'any.required': 'El contenido es obligatorio'
         })
 });
+
+export const validateGetDocumentoById = Joi.object({
+    id: Joi.string()
+        .required()
+        .messages({
+            'string.base': 'El ID debe ser texto',
+            'string.empty': 'El ID no puede estar vacío',
+            'any.required': 'El ID es obligatorio'
+        })
+});

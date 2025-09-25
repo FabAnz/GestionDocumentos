@@ -1,4 +1,7 @@
 import Documento from "../model/documento.js";
+import { permissionError } from "../errors/403-error.js";
+import { notFoundError } from "../errors/404-error.js";
+import mongoose from "mongoose";
 
 const documentoRepository = {
 
@@ -8,9 +11,25 @@ const documentoRepository = {
         return documentoGuardado;
     },
 
-    async getDocumentoById(id) {
-        const documento = await Documento.findById(id).populate('categorias');
-        return documento;
+    async getDocumentoById(idDocumento, userId) {
+        try {
+
+            if (!mongoose.Types.ObjectId.isValid(idDocumento)) {
+                throw notFoundError("ID de documento inválido");
+            }
+
+            const documento = await Documento.findById(idDocumento).populate('categorias');
+            if (!documento) {
+                throw notFoundError("No se encontró el documento");
+            }
+            const usuarioDelDocumento = documento.usuario;
+            if (usuarioDelDocumento.toString() !== userId.toString()) {
+                throw permissionError("No tienes permisos para acceder a este documento");
+            }
+            return documento;
+        } catch (error) {
+            throw error;
+        }
     },
 
     async getAllDocumentos(userId) {
@@ -19,7 +38,14 @@ const documentoRepository = {
     },
 
     async deleteDocumento(id) {
-        await Documento.findByIdAndDelete(id);
+        try {
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                throw notFoundError("ID de documento inválido");
+            }
+            await Documento.findByIdAndDelete(id);
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

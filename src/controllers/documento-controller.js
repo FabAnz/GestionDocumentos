@@ -45,11 +45,11 @@ export const createDocumento = async (req, res) => {
 
         // Manejar error de titulo duplicado
         if (error.code === 11000) {
-            return res.status(409).json({ 
-                message: "El titulo ya está registrado" 
+            return res.status(409).json({
+                message: "El titulo ya está registrado"
             });
         }
-        
+
         // Otros errores
         res.status(500).json({ message: error.message });
     }
@@ -59,11 +59,31 @@ export const getDocumentos = async (req, res) => {
     try {
         const userId = req.user.id;
         const documentos = await documentoRepository.getAllDocumentos(userId);
-        if(!documentos || documentos.length === 0) {
+        if (!documentos || documentos.length === 0) {
             return res.status(404).json({ message: "No se encontraron documentos" });
         }
         res.status(200).json(documentos);
     } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getDocumentoById = async (req, res) => {
+    try {
+        const idDocumento = req.params.id;
+        const userId = req.user.id;
+        const documento = await documentoRepository.getDocumentoById(idDocumento, userId);
+        if (!documento) {
+            return res.status(404).json({ message: "No se encontró el documento" });
+        }
+        res.status(200).json(documento);
+    } catch (error) {
+        if (error.statusCode === 403) {
+            return res.status(403).json({ message: error.message });
+        }
+        if (error.statusCode === 404) {
+            return res.status(404).json({ message: error.message });
+        }
         res.status(500).json({ message: error.message });
     }
 };
