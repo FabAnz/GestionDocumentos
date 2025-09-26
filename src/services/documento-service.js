@@ -92,8 +92,7 @@ const documentoService = {
             documento = await documentoRepository.deleteDocumento(idDocumento, userId);
 
             //Eliminar del RAG
-            console.log(idDocumento);
-            const response = await fetchService.put(urlEliminar, { idDocumento });
+            const response = await fetchService.delete(`${urlEliminar}/${idDocumento}`);
             console.log(response);
 
         } catch (error) {
