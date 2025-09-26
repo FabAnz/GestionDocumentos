@@ -37,6 +37,12 @@ const usuarioSchema = new mongoose.Schema({
         ref: "Documento",
         required: false,
     },
+
+    chats: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "Chat",
+        required: false,
+    },
 }, { timestamps: true });
 
 usuarioSchema.index({ email: 1 }, { unique: true });

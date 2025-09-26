@@ -14,17 +14,10 @@ const documentoService = {
 
     async createDocumento(documentoData) {
         let documento = null;
+        let usuario = null;
         try {
-            // Validar límites
-            const usuario = await usuarioRepository.getUserById(documentoData.usuario);
-            const { _id, nombre, interaccionesConDocumentosRestantes } = usuario.plan;
-
-
-            if (nombre === PLAN_TYPE.PLUS && interaccionesConDocumentosRestantes <= 0) {
-                throw new Error("LIMITE_ALCANZADO");
-            }
-
             // Crear documento
+            usuario = await usuarioRepository.getUserById(documentoData.usuario);
             documento = await documentoRepository.createDocumento(documentoData);
 
             // Actualizar usuario
@@ -33,16 +26,15 @@ const documentoService = {
                 { documentos: [...usuario.documentos, documento._id] }
             );
 
-
             // Enviar a RAG
             const response = await fetchService.post(urlCrearModificar, documento);
             console.log(response);
 
             // Decrementar interacciones
-            if (nombre === PLAN_TYPE.PLUS) {
+            if (usuario.plan.nombre === PLAN_TYPE.PLUS) {
                 await planRepository.updatePlanPlus(
-                    _id,
-                    { interaccionesConDocumentosRestantes: interaccionesConDocumentosRestantes - 1 }
+                    usuario.plan._id,
+                    { interaccionesConDocumentosRestantes: usuario.plan.interaccionesConDocumentosRestantes - 1 }
                 );
             }
             return documento;
@@ -50,7 +42,7 @@ const documentoService = {
             // Si falla la actualización del usuario, eliminar el documento creado
             if (documento && documento._id) {
                 try {
-                    await documentoRepository.deleteDocumento(documento._id);
+                    await documentoRepository.deleteDocumento(documento._id, usuario._id);
                 } catch (deleteError) {
                     console.error('Error al eliminar documento tras fallo en actualización de usuario:', deleteError);
                 }
