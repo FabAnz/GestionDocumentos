@@ -29,6 +29,8 @@ export const validateCreateDocumento = Joi.object({
             'string.max': 'El contenido no puede tener más de {{#limit}} caracteres',
             'any.required': 'El contenido es obligatorio'
         })
+}).options({
+    presence: "required"
 });
 
 export const validateDocumentoId = Joi.object({
@@ -39,6 +41,8 @@ export const validateDocumentoId = Joi.object({
             'string.empty': 'El ID no puede estar vacío',
             'any.required': 'El ID es obligatorio'
         })
+}).options({
+    presence: "required"
 });
 
 export const validateUpdateDocumento = Joi.object({

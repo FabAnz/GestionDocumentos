@@ -17,4 +17,3 @@ routes.put("/:id", validateRequest(validateDocumentoId, reqValidate.PARAMS), val
 routes.delete("/:id", validateRequest(validateDocumentoId, reqValidate.PARAMS), deleteDocumento);
 
 export default routes;
-//TODO: Falta restar el limite de interacciones con documentos en las modificaciones de documentos
