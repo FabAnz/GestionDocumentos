@@ -3,6 +3,7 @@ import REMITENTE from "../constants/mensaje-constant.js";
 import mensajeRepository from "../repositories/mensaje-repository.js";
 import fetchService from "./fetch-service.js";
 import dotenv from "dotenv";
+import usuarioRepository from "../repositories/usuario-repository.js";
 
 dotenv.config();
 
@@ -22,6 +23,9 @@ const mensajeService = {
                     usuario: userId
                 }
                 chat = await chatRepository.createChat(chatData);
+                //actualizar usuario
+                const usuario = await usuarioRepository.getUserById(userId);
+                await usuarioRepository.updateUsuario(userId, { chats: [...usuario.chats, chat._id] });
             }
             //crear mensaje
             const mensajeData = {
@@ -41,7 +45,6 @@ const mensajeService = {
             mensajeIA = await mensajeRepository.createMensaje(mensajeIAData);
             //actualizar chat con respuesta de IA
             chat = await chatRepository.updateChat(chat._id, { mensajes: [...chat.mensajes, mensajeIA._id] });
-
             return mensajeIA;
         } catch (error) {
             throw error;

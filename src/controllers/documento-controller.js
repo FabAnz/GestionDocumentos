@@ -50,6 +50,10 @@ export const createDocumento = async (req, res) => {
             });
         }
 
+        if (error.statusCode === 404) {
+            return res.status(404).json({ message: error.message });
+        }
+
         // Otros errores
         res.status(500).json({ message: error.message });
     }

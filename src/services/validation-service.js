@@ -9,10 +9,10 @@ const validationService = {
                     message: "Las categorías son obligatorias"
                 };
             }
-
+            
             // Verificar que todas las categorías existen
             const categoriasExistentes = await categoriaRepository.findCategoriasByIds(categoriaIds);
-
+            
             if (categoriasExistentes.length !== categoriaIds.length) {
                 return {
                     isValid: false,
@@ -23,12 +23,12 @@ const validationService = {
                     }))
                 };
             }
-
+            
             return {
                 isValid: true,
                 categorias: categoriasExistentes
             };
-
+            
         } catch (error) {
             throw error;
         }

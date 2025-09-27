@@ -6,8 +6,8 @@ const categoriaRepository = {
     async findCategorias() {
         try {
             const categorias = await Categoria.find();
-            if (!categorias) {
-                notFoundError("Categorías no encontradas");
+            if (!categorias || categorias.length === 0) {
+                throw notFoundError("Categorías no encontradas");
             }
             return categorias;
         } catch (error) {
@@ -18,8 +18,8 @@ const categoriaRepository = {
     async findCategoriasByIds(ids) {
         try {
             const categorias = await Categoria.find({ _id: { $in: ids } });
-            if (!categorias) {
-                notFoundError("Categorías no encontradas");
+            if (!categorias || categorias.length === 0) {  
+                throw notFoundError("Categorías no encontradas");
             }
             return categorias;
         } catch (error) {

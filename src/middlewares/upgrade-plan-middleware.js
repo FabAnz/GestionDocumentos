@@ -27,7 +27,7 @@ export const validateUpgradePlan = async (req, res, next) => {
 
         // Verificar que el plan actual es "plus"
         if (usuario.plan.nombre !== PLAN_TYPE.PLUS) {
-            return res.status(403).json({ 
+            return res.status(400).json({ 
                 message: "Actualmente ya cuentas con plan Premium",
                 planActual: usuario.plan.nombre,
                 planRequeridoParaUpgrade: PLAN_TYPE.PLUS
