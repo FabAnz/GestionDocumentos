@@ -29,6 +29,5 @@ app.listen(port, () => {
 });
 
 //En fase final
-//TODO: Conectar a bd en linea mongoDB Atlas
 //TODO: Se debe crear un workflow en n8n por usuario
 //TODO: Ponerle seguridad al webhook de n8n
