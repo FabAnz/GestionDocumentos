@@ -1,4 +1,4 @@
-import categoriaRepository from "../repositories/categotia-repository.js";
+import categoriaRepository from "../repositories/categoria-repository.js";
 
 const validationService = {
     async validateCategoriasExist(categoriaIds) {
