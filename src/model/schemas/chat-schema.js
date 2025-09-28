@@ -17,6 +17,6 @@ const chatSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-chatSchema.index({ idCliente: 1 }, { unique: true });
+chatSchema.index({ idCliente: 1, usuario: 1 }, { unique: true });
 
 export default chatSchema;

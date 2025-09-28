@@ -29,5 +29,5 @@ app.listen(port, () => {
 });
 
 //En fase final
-//TODO: Se debe crear un workflow en n8n por usuario
 //TODO: como se ejecuta el seeder en produccion?
+//TODO: configurar BD en produccion en versel

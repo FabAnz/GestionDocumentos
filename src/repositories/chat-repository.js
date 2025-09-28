@@ -9,7 +9,7 @@ const chatRepository = {
     },
     async getChatByIdCliente(idCliente, userId) {
         try {
-            const chat = await Chat.findOne({ idCliente }).populate('mensajes');
+            const chat = await Chat.findOne({ idCliente, usuario: userId }).populate('mensajes');
             if (chat && chat.usuario.toString() !== userId.toString()) {
                 throw permissionError("No tienes permisos para acceder a este chat");
             }

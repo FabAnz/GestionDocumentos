@@ -37,7 +37,7 @@ const mensajeService = {
             //actualizar chat
             chat = await chatRepository.updateChat(chat._id, { mensajes: [...chat.mensajes, mensajeCliente._id] });
             //Mandar a IA
-            const mensajeParaIA = { contenido: mensajeData.contenido, idCliente };
+            const mensajeParaIA = { contenido: mensajeData.contenido, idCliente, userId };
             const response = await fetchService.post(urlIA, mensajeParaIA, {
                 headers: {
                     "Authorization": `Bearer ${n8nToken}`
