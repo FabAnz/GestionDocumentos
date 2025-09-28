@@ -1,30 +1,22 @@
-import mongoose from "mongoose";
-import { connectMongo } from "../config/mongo-config.js";
 import categoriaSeeder from "./seeders/categoria-seeder.js";
+// import planSeeder from "./seeders/plan-seeder.js";        // Futuro seeder
+// import usuarioSeeder from "./seeders/usuario-seeder.js";  // Futuro seeder
 
 const runSeeders = async () => {
     try {
-        console.log("🌱 Iniciando seeding de la base de datos...");
+        console.log("🌱 Ejecutando seeding automático...");
         
-        // Conectar a MongoDB
-        await connectMongo();
-        console.log("✅ Conectado a MongoDB");
-
-        // Ejecutar seeders
+        // Ejecutar seeders en orden
         await categoriaSeeder();
+        // await planSeeder();        // Futuro seeder
+        // await usuarioSeeder();     // Futuro seeder
 
-        console.log("🎉 Seeding completado exitosamente!");
+        console.log("✅ Seeding completado exitosamente");
         
     } catch (error) {
         console.error("❌ Error durante el seeding:", error);
-    } finally {
-        // Cerrar conexión
-        await mongoose.connection.close();
-        console.log("🔌 Conexión a MongoDB cerrada");
-        process.exit(0);
+        throw error; // Re-lanzar para que app-initializer.js lo maneje
     }
 };
-
-runSeeders();
 
 export default runSeeders;

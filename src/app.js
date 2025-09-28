@@ -3,16 +3,17 @@ import dotenv from "dotenv";
 import { xssSanitizer } from "./middlewares/sanitizer-middleware.js";
 import v1UsuarioRoutes from "./routes/v1/usuario-routes.js";
 import v1DocumentoRoutes from "./routes/v1/documento-routes.js";
-import { connectMongo } from "./config/mongo-config.js";
 import v1MensajeRoutes from "./routes/v1/mensaje-routes.js";
 import v1CategoriaRoutes from "./routes/v1/categoria-routes.js";
+import initializeApp from "./config/app-initializer.js";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT;
 
-connectMongo();
+// Inicializar aplicación
+await initializeApp();
 
 app.use(express.json());
 
@@ -27,7 +28,3 @@ app.use("/api/v1/categorias", v1CategoriaRoutes);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-//En fase final
-//TODO: como se ejecuta el seeder en produccion?
-//TODO: configurar BD en produccion en versel
