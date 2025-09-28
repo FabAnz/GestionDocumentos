@@ -30,4 +30,4 @@ app.listen(port, () => {
 
 //En fase final
 //TODO: Se debe crear un workflow en n8n por usuario
-//TODO: Ponerle seguridad al webhook de n8n
+//TODO: como se ejecuta el seeder en produccion?

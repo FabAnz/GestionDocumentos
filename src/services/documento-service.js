@@ -9,6 +9,7 @@ import { badRequestError } from "../errors/400-error.js";
 dotenv.config();
 const urlCrearModificar = process.env.RAG_URL_CREAR_MODIFICAR;
 const urlEliminar = process.env.RAG_URL_ELIMINAR;
+const n8nToken = process.env.N8N_JWT_TOKEN;
 
 const documentoService = {
 
@@ -27,7 +28,11 @@ const documentoService = {
             );
 
             // Enviar a RAG
-            const response = await fetchService.post(urlCrearModificar, documento);
+            const response = await fetchService.post(urlCrearModificar, documento, {
+                headers: {
+                    "Authorization": `Bearer ${n8nToken}`
+                }
+            });
             console.log(response);
 
             // Decrementar interacciones
@@ -61,7 +66,11 @@ const documentoService = {
             const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
 
             // Enviar a RAG
-            const response = await fetchService.post(urlCrearModificar, documentoActualizado);
+            const response = await fetchService.post(urlCrearModificar, documentoActualizado, {
+                headers: {
+                    "Authorization": `Bearer ${n8nToken}`
+                }
+            });
             console.log(response);
 
             return documentoActualizado;
@@ -84,7 +93,11 @@ const documentoService = {
             documento = await documentoRepository.deleteDocumento(idDocumento, userId);
 
             //Eliminar del RAG
-            const response = await fetchService.delete(`${urlEliminar}/${idDocumento}`);
+            const response = await fetchService.delete(`${urlEliminar}/${idDocumento}`, {
+                headers: {
+                    "Authorization": `Bearer ${n8nToken}`
+                }
+            });
             console.log(response);
 
         } catch (error) {

@@ -8,6 +8,7 @@ import usuarioRepository from "../repositories/usuario-repository.js";
 dotenv.config();
 
 const urlIA = process.env.CHATBOT_URL;
+const n8nToken = process.env.N8N_JWT_TOKEN;
 
 const mensajeService = {
     async probarChat(idCliente, contenido, userId) {
@@ -36,8 +37,12 @@ const mensajeService = {
             //actualizar chat
             chat = await chatRepository.updateChat(chat._id, { mensajes: [...chat.mensajes, mensajeCliente._id] });
             //Mandar a IA
-            mensajeCliente = { ...mensajeCliente, idCliente };
-            const response = await fetchService.post(urlIA, mensajeCliente);
+            const mensajeParaIA = { contenido: mensajeData.contenido, idCliente };
+            const response = await fetchService.post(urlIA, mensajeParaIA, {
+                headers: {
+                    "Authorization": `Bearer ${n8nToken}`
+                }
+            });
             const mensajeIAData = { 
                 remitente: REMITENTE.IA,
                 contenido: response.output
