@@ -27,4 +27,4 @@ app.use("/api/v1/categorias", v1CategoriaRoutes);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-});
+}); 
