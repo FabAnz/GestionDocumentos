@@ -44,7 +44,8 @@ export const loginUsuario = async (req, res) => {
                 nombre: usuario.nombre,
                 plan: {
                     id: usuario.plan._id,
-                    nombre: usuario.plan.nombre                }
+                    nombre: usuario.plan.nombre
+                }
             }
         });
     } catch (error) {

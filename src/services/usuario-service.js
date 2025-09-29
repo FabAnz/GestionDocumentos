@@ -40,11 +40,12 @@ const usuarioService = {
     },
 
     async upgradePlan(usuario) {
+        let newPlan = null;
         try {
             const planData = {
                 nombre: PLAN_TYPE.PREMIUM,
             }
-            const newPlan = await planRepository.createPlanPremium(planData);
+            newPlan = await planRepository.createPlanPremium(planData);
             const usuarioActualizado = await usuarioRepository.updateUsuario(
                 usuario._id, 
                 { plan: newPlan._id }
@@ -53,7 +54,14 @@ const usuarioService = {
             return usuarioActualizado;
         }
         catch (error) {
-            await planRepository.deletePlan(newPlan._id);
+            // Solo eliminar el nuevo plan si se creó exitosamente
+            if (newPlan && newPlan._id) {
+                try {
+                    await planRepository.deletePlan(newPlan._id);
+                } catch (deleteError) {
+                    console.error('Error al eliminar plan tras fallo en upgrade:', deleteError);
+                }
+            }
             throw error;
         }
     }
