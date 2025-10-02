@@ -29,8 +29,7 @@ const documentoService = {
             // 2. Consultar BD
             const documentos = await documentoRepository.getAllDocumentos(userId);
 
-            // 3. Guardar en caché (5 minutos)
-            await setValue(cacheKey, documentos, 300);
+            await setValue(cacheKey, documentos, 3600);
 
             return documentos;
         } catch (error) {
@@ -51,8 +50,7 @@ const documentoService = {
             // 2. Consultar BD
             const documento = await documentoRepository.getDocumentoById(idDocumento, userId);
 
-            // 3. Guardar en caché (10 minutos - datos individuales más estables)
-            await setValue(cacheKey, documento, 600);
+            await setValue(cacheKey, documento, 3600);
 
             return documento;
         } catch (error) {

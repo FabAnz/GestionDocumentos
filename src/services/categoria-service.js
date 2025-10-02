@@ -10,7 +10,7 @@ const categoriaService = {
                 return cachedCategorias;
             }
             const categorias = await categoriaRepository.findCategorias();
-            await setValue("categorias:all", categorias, 300);
+            await setValue("categorias:all", categorias, 3600);
             return categorias;
         } catch (error) {
             throw error;
