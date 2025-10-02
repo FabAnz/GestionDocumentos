@@ -5,6 +5,7 @@ import fetchService from "./fetch-service.js";
 import dotenv from "dotenv";
 import { PLAN_TYPE } from "../constants/plan-constant.js";
 import { badRequestError } from "../errors/400-error.js";
+import { getValue, setValue, deleteValue } from "./redis-service.js";
 
 dotenv.config();
 const urlCrearModificar = process.env.RAG_URL_CREAR_MODIFICAR;
@@ -12,6 +13,54 @@ const urlEliminar = process.env.RAG_URL_ELIMINAR;
 const n8nToken = process.env.N8N_JWT_TOKEN;
 
 const documentoService = {
+
+    // ============ MÉTODOS DE LECTURA (con caché) ============
+
+    async getAllDocumentos(userId) {
+        try {
+            const cacheKey = `documentos:usuario:${userId}`;
+
+            // 1. Intentar obtener de caché
+            const cachedDocumentos = await getValue(cacheKey);
+            if (cachedDocumentos) {
+                return cachedDocumentos;
+            }
+
+            // 2. Consultar BD
+            const documentos = await documentoRepository.getAllDocumentos(userId);
+
+            // 3. Guardar en caché (5 minutos)
+            await setValue(cacheKey, documentos, 300);
+
+            return documentos;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getDocumentoById(idDocumento, userId) {
+        try {
+            const cacheKey = `documento:${idDocumento}:usuario:${userId}`;
+
+            // 1. Intentar obtener de caché
+            const cachedDocumento = await getValue(cacheKey);
+            if (cachedDocumento) {
+                return cachedDocumento;
+            }
+
+            // 2. Consultar BD
+            const documento = await documentoRepository.getDocumentoById(idDocumento, userId);
+
+            // 3. Guardar en caché (10 minutos - datos individuales más estables)
+            await setValue(cacheKey, documento, 600);
+
+            return documento;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // ============ MÉTODOS DE ESCRITURA (con invalidación de caché) ============
 
     async createDocumento(documentoData) {
         let documento = null;
@@ -42,6 +91,10 @@ const documentoService = {
                     { interaccionesConDocumentosRestantes: usuario.plan.interaccionesConDocumentosRestantes - 1 }
                 );
             }
+
+            // Invalidar caché del listado de documentos del usuario
+            await deleteValue(`documentos:usuario:${documentoData.usuario}`);
+
             return documento;
         } catch (error) {
             // Si falla la actualización del usuario, eliminar el documento creado
@@ -73,6 +126,12 @@ const documentoService = {
             });
             console.log(response);
 
+            // Invalidar cachés relacionados
+            await deleteValue([
+                `documento:${idDocumento}:usuario:${userId}`,  // Caché del documento individual
+                `documentos:usuario:${userId}`                  // Caché del listado del usuario
+            ]);
+
             return documentoActualizado;
         } catch (error) {
             // Si falla la actualización restaurar el documento
@@ -99,6 +158,12 @@ const documentoService = {
                 }
             });
             console.log(response);
+
+            // Invalidar cachés relacionados
+            await deleteValue([
+                `documento:${idDocumento}:usuario:${userId}`,  // Caché del documento individual
+                `documentos:usuario:${userId}`                  // Caché del listado del usuario
+            ]);
 
         } catch (error) {
             if (documento && documento._id) {

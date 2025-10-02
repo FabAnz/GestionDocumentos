@@ -1,11 +1,14 @@
 import { connectMongo } from "./mongo-config.js";
 import runSeeders from "../scripts/seed.js";
 import Categoria from "../model/categoria.js";
+import { connectRedis } from "./redis-config.js";
 
 const initializeApp = async () => {
     try {
         // Conectar a MongoDB
         await connectMongo();
+        // Conectar a Redis
+        await connectRedis();
 
         // Seeding automático solo en producción
         if (process.env.NODE_ENV === 'production') {
