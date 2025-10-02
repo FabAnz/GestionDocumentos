@@ -2,13 +2,13 @@
   "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "api/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js",
-    "start:prod": "NODE_ENV=production node src/app.js",
-    "dev": "nodemon src/app.js",
+    "start": "node api/dev.js",
+    "start:prod": "NODE_ENV=production node api/dev.js",
+    "dev": "nodemon api/dev.js",
     "seed": "node src/scripts/seed.js",
     "seed:force": "NODE_ENV=production node src/scripts/seed.js"
   },
