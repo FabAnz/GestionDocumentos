@@ -40,19 +40,28 @@ export const loginUsuario = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: process.env.JWT_EXPIRATION || '1h' }
         );
+        
+        // Preparar respuesta del usuario
+        const usuarioRespuesta = {
+            id: usuario._id,
+            email: usuario.email,
+            nombre: usuario.nombre
+        };
+        
+        // Agregar información del plan solo si existe
+        if (usuario.plan) {
+            usuarioRespuesta.plan = {
+                id: usuario.plan._id,
+                nombre: usuario.plan.nombre
+            };
+        }
+        
         res.status(200).json({ 
             token, 
-            usuario: {
-                id: usuario._id,
-                email: usuario.email,
-                nombre: usuario.nombre,
-                plan: {
-                    id: usuario.plan._id,
-                    nombre: usuario.plan.nombre
-                }
-            }
+            usuario: usuarioRespuesta
         });
     } catch (error) {
+        console.error("Error en loginUsuario:", error);
         res.status(500).json({ message: error.message });
     }
 }
