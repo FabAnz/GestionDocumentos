@@ -10,7 +10,9 @@
     "start:prod": "NODE_ENV=production node api/dev.js",
     "dev": "nodemon api/dev.js",
     "seed": "node src/scripts/seed.js",
-    "seed:force": "NODE_ENV=production node src/scripts/seed.js"
+    "seed:force": "NODE_ENV=production node src/scripts/seed.js",
+    "load:test": "node src/scripts/load-test-data.js",
+    "clean:test": "node src/scripts/clean-test-data.js"
   },
   "keywords": [],
   "author": "",

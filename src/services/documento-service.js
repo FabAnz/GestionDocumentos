@@ -75,12 +75,11 @@ const documentoService = {
             );
 
             // Enviar a RAG
-            const response = await fetchService.post(urlCrearModificar, documento, {
+            await fetchService.post(urlCrearModificar, documento, {
                 headers: {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
-            console.log(response);
 
             // Decrementar interacciones
             if (usuario.plan.nombre === PLAN_TYPE.PLUS) {
@@ -117,12 +116,11 @@ const documentoService = {
             const documentoActualizado = await documentoRepository.updateDocumento(idDocumento, documentoData, userId);
 
             // Enviar a RAG
-            const response = await fetchService.post(urlCrearModificar, documentoActualizado, {
+            await fetchService.post(urlCrearModificar, documentoActualizado, {
                 headers: {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
-            console.log(response);
 
             // Invalidar cachés relacionados
             await deleteValue([
@@ -150,12 +148,11 @@ const documentoService = {
             documento = await documentoRepository.deleteDocumento(idDocumento, userId);
 
             //Eliminar del RAG
-            const response = await fetchService.delete(`${urlEliminar}/${idDocumento}`, {
+            await fetchService.delete(`${urlEliminar}/${idDocumento}`, {
                 headers: {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
-            console.log(response);
 
             // Invalidar cachés relacionados
             await deleteValue([
