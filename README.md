@@ -198,27 +198,7 @@ npm i -g vercel
 vercel
 ```
 
-Asegúrate de configurar las variables de entorno en el dashboard de Vercel.
 
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea tu rama de características (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-## 📝 Licencia
-
-ISC
-
-## 👥 Autor
-
-[Tu nombre aquí]
-
-## 📞 Contacto
-
-Para preguntas o sugerencias, por favor abre un issue en el repositorio.
 
 ---
 
