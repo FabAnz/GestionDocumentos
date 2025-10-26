@@ -12,35 +12,35 @@ dotenv.config();
 
 // Datos de usuarios de prueba
 const usuariosTest = [
-    {
-        email: "maria.gonzalez@test.com",
-        password: "Test123!@",
-        nombre: "María",
-        apellido: "González",
-        tipoPlan: "plus"
-    },
-    {
-        email: "juan.perez@test.com",
-        password: "Secure456#$",
-        nombre: "Juan",
-        apellido: "Pérez",
-        tipoPlan: "premium"
-    },
-    {
-        email: "ana.martinez@test.com",
-        password: "Strong789%&",
-        nombre: "Ana",
-        apellido: "Martínez",
-        tipoPlan: "plus"
-    }
+   {
+      email: "maria.gonzalez@test.com",
+      password: "Test123!@",
+      nombre: "María",
+      apellido: "González",
+      tipoPlan: "plus"
+   },
+   {
+      email: "juan.perez@test.com",
+      password: "Secure456#$",
+      nombre: "Juan",
+      apellido: "Pérez",
+      tipoPlan: "premium"
+   },
+   {
+      email: "ana.martinez@test.com",
+      password: "Strong789%&",
+      nombre: "Ana",
+      apellido: "Martínez",
+      tipoPlan: "plus"
+   }
 ];
 
 // Datos de documentos de prueba (9 por usuario = 27 total)
 const documentosTest = [
-    // Documentos para María (Usuario 1) - 9 documentos
-    {
-        titulo: "Guía de inicio rápido para nuevos usuarios",
-        contenido: `MANUAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL
+   // Documentos para María (Usuario 1) - 9 documentos
+   {
+      titulo: "Guía de inicio rápido para nuevos usuarios",
+      contenido: `MANUAL DE BIENVENIDA Y CONFIGURACIÓN INICIAL
 
 1. INTRODUCCIÓN
 Bienvenido a TechCorp Solutions. Este manual ha sido diseñado para facilitar tu integración a nuestra plataforma empresarial de gestión documental y comunicación interna. Nuestro sistema ha sido implementado en más de 500 empresas a nivel global y procesamos más de 2 millones de documentos mensualmente.
@@ -88,11 +88,11 @@ El menú principal se encuentra en la barra lateral izquierda:
 
 7. SOPORTE TÉCNICO
 Si necesitas ayuda, contacta a soporte@techcorp.com o utiliza el chat en vivo disponible 24/7.`,
-        categoriasNombres: ["F. A. Q."]
-    },
-    {
-        titulo: "Solución de problemas comunes de conexión",
-        contenido: `GUÍA DE RESOLUCIÓN DE PROBLEMAS DE CONECTIVIDAD
+      categoriasNombres: ["F. A. Q."]
+   },
+   {
+      titulo: "Solución de problemas comunes de conexión",
+      contenido: `GUÍA DE RESOLUCIÓN DE PROBLEMAS DE CONECTIVIDAD
 
 DOCUMENTO TÉCNICO - DEPARTAMENTO DE SOPORTE
 Última actualización: 2025 | Versión 3.2
@@ -174,11 +174,11 @@ INFORMACIÓN A PROPORCIONAR AL SOPORTE:
 Ticket de soporte: support.techcorp.com
 Email: soporte@techcorp.com
 Teléfono: +1-800-TECH-CORP (disponible 24/7)`,
-        categoriasNombres: ["Soporte técnico", "F. A. Q."]
-    },
-    {
-        titulo: "Preguntas frecuentes sobre la facturación",
-        contenido: `FAQ - DEPARTAMENTO DE ADMINISTRACIÓN Y FINANZAS
+      categoriasNombres: ["Soporte técnico", "F. A. Q."]
+   },
+   {
+      titulo: "Preguntas frecuentes sobre la facturación",
+      contenido: `FAQ - DEPARTAMENTO DE ADMINISTRACIÓN Y FINANZAS
 Documento oficial | Última revisión: Enero 2025
 
 P1: ¿Cuándo se realiza el cobro de mi suscripción?
@@ -209,11 +209,11 @@ P9: ¿Facturan en mi moneda local?
 R: Soportamos USD, EUR, GBP, CAD, AUD, BRL, MXN, COP, ARS, CLP, PEN. Usamos el tipo de cambio de Visa/MasterCard del día de la transacción sin recargos adicionales.
 
 Para consultas específicas: billing@techcorp.com | Tel: +1-800-BILLING`,
-        categoriasNombres: ["F. A. Q."]
-    },
-    {
-        titulo: "Tutorial completo de funcionalidades básicas",
-        contenido: `TUTORIAL INTERACTIVO - FUNCIONALIDADES ESENCIALES
+      categoriasNombres: ["F. A. Q."]
+   },
+   {
+      titulo: "Tutorial completo de funcionalidades básicas",
+      contenido: `TUTORIAL INTERACTIVO - FUNCIONALIDADES ESENCIALES
 Manual de usuario v4.0 | TechCorp Solutions
 
 MÓDULO 1: GESTIÓN DEL PERFIL
@@ -313,11 +313,11 @@ MEJORES PRÁCTICAS:
 
 Completar este tutorial: 15-20 minutos
 Certificación disponible al finalizar los 5 módulos`,
-        categoriasNombres: ["F. A. Q.", "Soporte técnico"]
-    },
-    {
-        titulo: "Cómo actualizar tu información de perfil",
-        contenido: `GUÍA DE ACTUALIZACIÓN DE PERFIL CORPORATIVO
+      categoriasNombres: ["F. A. Q.", "Soporte técnico"]
+   },
+   {
+      titulo: "Cómo actualizar tu información de perfil",
+      contenido: `GUÍA DE ACTUALIZACIÓN DE PERFIL CORPORATIVO
 
 1. IMPORTANCIA DE MANTENER TU PERFIL ACTUALIZADO
 Un perfil completo y actualizado facilita la colaboración, mejora la comunicación entre equipos y ayuda a otros a conocer tu rol en la organización. Los perfiles completos tienen 3 veces más interacciones que los perfiles básicos.
@@ -445,11 +445,11 @@ Configuración > Privacidad > Exportar datos personales
 Recibirás un archivo JSON con todos tus datos en 24-48 horas.
 
 ¿Necesitas ayuda? Contacta a support@techcorp.com`,
-        categoriasNombres: ["F. A. Q."]
-    },
-    {
-        titulo: "Guía de navegación por la interfaz",
-        contenido: `MANUAL DE NAVEGACIÓN - INTERFAZ TECHCORP SOLUTIONS
+      categoriasNombres: ["F. A. Q."]
+   },
+   {
+      titulo: "Guía de navegación por la interfaz",
+      contenido: `MANUAL DE NAVEGACIÓN - INTERFAZ TECHCORP SOLUTIONS
 Versión 5.0 | Optimizada para productividad
 
 RESUMEN EJECUTIVO:
@@ -638,11 +638,11 @@ MÓVIL (<768px):
 → Usa búsqueda global (Ctrl + K) y escribe lo que buscas
 
 Para más ayuda: help.techcorp.com`,
-        categoriasNombres: ["F. A. Q."]
-    },
-    {
-        titulo: "Resolución de errores al cargar archivos",
-        contenido: `TROUBLESHOOTING - PROBLEMAS DE CARGA DE ARCHIVOS
+      categoriasNombres: ["F. A. Q."]
+   },
+   {
+      titulo: "Resolución de errores al cargar archivos",
+      contenido: `TROUBLESHOOTING - PROBLEMAS DE CARGA DE ARCHIVOS
 Departamento de Soporte Técnico | Documento ID: ST-045
 
 INTRODUCCIÓN:
@@ -877,11 +877,11 @@ Tiempo de respuesta: < 4 horas hábiles
 Soporte prioritario Premium: < 1 hora
 
 Línea directa: +1-800-TECH-CORP (opción 2)`,
-        categoriasNombres: ["Soporte técnico"]
-    },
-    {
-        titulo: "Configuración de notificaciones personalizadas",
-        contenido: `GUÍA COMPLETA DE NOTIFICACIONES INTELIGENTES
+      categoriasNombres: ["Soporte técnico"]
+   },
+   {
+      titulo: "Configuración de notificaciones personalizadas",
+      contenido: `GUÍA COMPLETA DE NOTIFICACIONES INTELIGENTES
 Sistema de Alertas TechCorp v3.5
 
 FILOSOFÍA DEL SISTEMA:
@@ -1179,11 +1179,11 @@ PARA EQUILIBRIO VIDA-TRABAJO:
 
 Soporte: notifications@techcorp.com
 Feedback: Ayúdanos a mejorar reportando falsos positivos`,
-        categoriasNombres: ["Soporte técnico", "F. A. Q."]
-    },
-    {
-        titulo: "Preguntas sobre compatibilidad de navegadores",
-        contenido: `MATRIZ DE COMPATIBILIDAD - NAVEGADORES WEB
+      categoriasNombres: ["Soporte técnico", "F. A. Q."]
+   },
+   {
+      titulo: "Preguntas sobre compatibilidad de navegadores",
+      contenido: `MATRIZ DE COMPATIBILIDAD - NAVEGADORES WEB
 TechCorp Solutions | Actualizado: Enero 2025
 
 RESUMEN EJECUTIVO:
@@ -1515,13 +1515,13 @@ Tu navegador es el corazón de la experiencia TechCorp.
 Mantenerlo actualizado garantiza seguridad, rendimiento y acceso a nuevas funcionalidades.
 
 ¿Dudas sobre tu navegador? → support@techcorp.com`,
-        categoriasNombres: ["F. A. Q.", "Soporte técnico"]
-    },
+      categoriasNombres: ["F. A. Q.", "Soporte técnico"]
+   },
 
-    // Documentos para Juan (Usuario 2) - 9 documentos
-    {
-        titulo: "Política de privacidad y protección de datos",
-        contenido: `POLÍTICA DE PRIVACIDAD Y PROTECCIÓN DE DATOS PERSONALES
+   // Documentos para Juan (Usuario 2) - 9 documentos
+   {
+      titulo: "Política de privacidad y protección de datos",
+      contenido: `POLÍTICA DE PRIVACIDAD Y PROTECCIÓN DE DATOS PERSONALES
 TechCorp Solutions Inc. | Versión 4.0 | Vigencia: Enero 2025
 
 INTRODUCCIÓN
@@ -1826,11 +1826,11 @@ Puedes retirar tu consentimiento en cualquier momento cerrando tu cuenta o conta
 
 Última revisión: 15 de Enero de 2025
 Próxima revisión programada: Enero 2026`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
-    {
-        titulo: "Términos y condiciones de uso del servicio",
-        contenido: `TÉRMINOS Y CONDICIONES DE SERVICIO
+      categoriasNombres: ["Políticas de la empresa"]
+   },
+   {
+      titulo: "Términos y condiciones de uso del servicio",
+      contenido: `TÉRMINOS Y CONDICIONES DE SERVICIO
 TechCorp Solutions Inc. | Versión 5.0 | Efectivo desde: 01 Enero 2025
 
 ACUERDO LEGAL VINCULANTE
@@ -2172,11 +2172,11 @@ FECHA DE VIGOR: 01 de Enero de 2025
 PRÓXIMA REVISIÓN: Enero 2026
 
 Al hacer clic en "Acepto" o usar nuestros servicios, confirmas que has leído, comprendido y aceptado estos Términos de Servicio.`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
-    {
-        titulo: "Guía de configuración avanzada del sistema",
-        contenido: `MANUAL DE CONFIGURACIÓN AVANZADA
+      categoriasNombres: ["Políticas de la empresa"]
+   },
+   {
+      titulo: "Guía de configuración avanzada del sistema",
+      contenido: `MANUAL DE CONFIGURACIÓN AVANZADA
 TechCorp Solutions | Documento Técnico v2.5 | Para usuarios avanzados
 
 ADVERTENCIA: Este documento contiene configuraciones avanzadas que pueden afectar el rendimiento y comportamiento de la plataforma. Solo procede si tienes conocimientos técnicos. Configuraciones incorrectas pueden degradar tu experiencia. TechCorp no se responsabiliza por configuraciones erróneas realizadas por usuarios.
@@ -2629,11 +2629,11 @@ API Reference: api.techcorp.com
 Este documento se actualiza trimestralmente.
 Última actualización: Enero 2025
 Próxima revisión: Abril 2025`,
-        categoriasNombres: ["Soporte técnico"]
-    },
-    {
-        titulo: "Política de uso aceptable de recursos",
-        contenido: `POLÍTICA DE USO ACEPTABLE (AUP)
+      categoriasNombres: ["Soporte técnico"]
+   },
+   {
+      titulo: "Política de uso aceptable de recursos",
+      contenido: `POLÍTICA DE USO ACEPTABLE (AUP)
 TechCorp Solutions | Revisión 3.0 | Enero 2025
 
 PROPÓSITO
@@ -2748,11 +2748,11 @@ abuse@techcorp.com - Reportar violaciones
 legal@techcorp.com - Preguntas legales sobre AUP
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
-    {
-        titulo: "Manual de integración con APIs externas",
-        contenido: `MANUAL DE INTEGRACIÓN CON APIS
+      categoriasNombres: ["Políticas de la empresa"]
+   },
+   {
+      titulo: "Manual de integración con APIs externas",
+      contenido: `MANUAL DE INTEGRACIÓN CON APIS
 TechCorp Solutions | Guía del Desarrollador v2.0
 
 INTRODUCCIÓN
@@ -3066,11 +3066,11 @@ SOPORTE
 - Discord: discord.gg/techcorp-dev
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico"]
-    },
-    {
-        titulo: "Código de conducta de la comunidad",
-        contenido: `CÓDIGO DE CONDUCTA DE LA COMUNIDAD
+      categoriasNombres: ["Soporte técnico"]
+   },
+   {
+      titulo: "Código de conducta de la comunidad",
+      contenido: `CÓDIGO DE CONDUCTA DE LA COMUNIDAD
 TechCorp Solutions | Versión 2.0 | Enero 2025
 
 NUESTRA PROMESA
@@ -3257,11 +3257,11 @@ Juntos creamos un ambiente donde todos pueden prosperar.
 
 Última actualización: Enero 2025
 Próxima revisión: Enero 2026`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
-    {
-        titulo: "Procedimientos de backup y recuperación de datos",
-        contenido: `MANUAL DE BACKUP Y RECUPERACIÓN DE DATOS
+      categoriasNombres: ["Políticas de la empresa"]
+   },
+   {
+      titulo: "Procedimientos de backup y recuperación de datos",
+      contenido: `MANUAL DE BACKUP Y RECUPERACIÓN DE DATOS
 TechCorp Solutions | Documento Técnico | Enero 2025
 
 FILOSOFÍA DE PROTECCIÓN DE DATOS
@@ -3514,11 +3514,11 @@ NO EMERGENCIAS:
 
 Última actualización: Enero 2025
 Próxima auditoría: Abril 2025`,
-        categoriasNombres: ["Soporte técnico", "Políticas de la empresa"]
-    },
-    {
-        titulo: "Guía de optimización de rendimiento",
-        contenido: `GUÍA DE OPTIMIZACIÓN DE RENDIMIENTO
+      categoriasNombres: ["Soporte técnico", "Políticas de la empresa"]
+   },
+   {
+      titulo: "Guía de optimización de rendimiento",
+      contenido: `GUÍA DE OPTIMIZACIÓN DE RENDIMIENTO
 TechCorp Solutions | Best Practices | Enero 2025
 
 OBJETIVO
@@ -3847,11 +3847,11 @@ ENTERPRISE:
 Clientes enterprise tienen acceso a consultor de rendimiento dedicado
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico"]
-    },
-    {
-        titulo: "Acuerdo de nivel de servicio (SLA)",
-        contenido: `ACUERDO DE NIVEL DE SERVICIO (SLA)
+      categoriasNombres: ["Soporte técnico"]
+   },
+   {
+      titulo: "Acuerdo de nivel de servicio (SLA)",
+      contenido: `ACUERDO DE NIVEL DE SERVICIO (SLA)
 TechCorp Solutions Inc. | Versión 3.0 | Vigente desde Enero 2025
 
 INTRODUCCIÓN
@@ -4128,13 +4128,13 @@ No hay compensación adicional salvo acordada en contrato Enterprise.
 
 Actualizado: Enero 2025
 Próxima revisión: Enero 2026`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
+      categoriasNombres: ["Políticas de la empresa"]
+   },
 
-    // Documentos para Ana (Usuario 3) - 9 documentos
-    {
-        titulo: "Cómo recuperar tu contraseña olvidada",
-        contenido: `GUÍA DE RECUPERACIÓN DE CONTRASEÑA
+   // Documentos para Ana (Usuario 3) - 9 documentos
+   {
+      titulo: "Cómo recuperar tu contraseña olvidada",
+      contenido: `GUÍA DE RECUPERACIÓN DE CONTRASEÑA
 TechCorp Solutions | FAQ | Actualizado Enero 2025
 
 ¿OLVIDASTE TU CONTRASEÑA?
@@ -4357,11 +4357,11 @@ SOPORTE DE RECUPERACIÓN:
 ¿Aún tienes problemas? Contáctanos, estamos aquí para ayudarte.
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["F. A. Q.", "Soporte técnico"]
-    },
-    {
-        titulo: "Política de reembolsos y cancelaciones",
-        contenido: `POLÍTICA DE REEMBOLSOS Y CANCELACIONES
+      categoriasNombres: ["F. A. Q.", "Soporte técnico"]
+   },
+   {
+      titulo: "Política de reembolsos y cancelaciones",
+      contenido: `POLÍTICA DE REEMBOLSOS Y CANCELACIONES
 TechCorp Solutions | Términos Comerciales | Enero 2025
 
 COMPROMISO DE SATISFACCIÓN
@@ -4656,11 +4656,11 @@ FRAUDE O CARGOS NO AUTORIZADOS:
 - Email: fraud@techcorp.com (urgente)
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Políticas de la empresa", "F. A. Q."]
-    },
-    {
-        titulo: "Mejores prácticas de seguridad para tu cuenta",
-        contenido: `GUÍA DE SEGURIDAD DE CUENTA
+      categoriasNombres: ["Políticas de la empresa", "F. A. Q."]
+   },
+   {
+      titulo: "Mejores prácticas de seguridad para tu cuenta",
+      contenido: `GUÍA DE SEGURIDAD DE CUENTA
 TechCorp Solutions | Centro de Seguridad | Enero 2025
 
 INTRODUCCIÓN
@@ -5032,11 +5032,11 @@ RECURSOS ADICIONALES:
 Recuerda: La seguridad es un proceso continuo, no un evento único.
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico", "Políticas de la empresa"]
-    },
-    {
-        titulo: "Gestión de múltiples dispositivos conectados",
-        contenido: `GUÍA DE GESTIÓN DE DISPOSITIVOS
+      categoriasNombres: ["Soporte técnico", "Políticas de la empresa"]
+   },
+   {
+      titulo: "Gestión de múltiples dispositivos conectados",
+      contenido: `GUÍA DE GESTIÓN DE DISPOSITIVOS
 TechCorp Solutions | Multi-Dispositivo | Enero 2025
 
 INTRODUCCIÓN
@@ -5437,11 +5437,11 @@ SEGURIDAD:
 - Email: security@techcorp.com (24/7)
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico", "F. A. Q."]
-    },
-    {
-        titulo: "Preguntas frecuentes sobre planes y upgrades",
-        contenido: `FAQ: PLANES Y UPGRADES
+      categoriasNombres: ["Soporte técnico", "F. A. Q."]
+   },
+   {
+      titulo: "Preguntas frecuentes sobre planes y upgrades",
+      contenido: `FAQ: PLANES Y UPGRADES
 TechCorp Solutions | Preguntas Frecuentes | Enero 2025
 
 ¿PENSANDO EN ACTUALIZAR TU PLAN?
@@ -5786,11 +5786,11 @@ CONSIDERA DOWNGRADE SI:
 Recuerda: Puedes cambiar de plan en cualquier momento. Experimenta sin compromiso con nuestra garantía de 30 días.
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["F. A. Q."]
-    },
-    {
-        titulo: "Manual de uso del buscador avanzado",
-        contenido: `MANUAL DEL BUSCADOR AVANZADO
+      categoriasNombres: ["F. A. Q."]
+   },
+   {
+      titulo: "Manual de uso del buscador avanzado",
+      contenido: `MANUAL DEL BUSCADOR AVANZADO
 TechCorp Solutions | Guía de Búsqueda | Enero 2025
 
 INTRODUCCIÓN
@@ -6205,11 +6205,11 @@ SHORTCUTS CARD:
 - help.techcorp.com/shortcuts
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico", "F. A. Q."]
-    },
-    {
-        titulo: "Política de retención y eliminación de datos",
-        contenido: `POLÍTICA DE RETENCIÓN Y ELIMINACIÓN DE DATOS
+      categoriasNombres: ["Soporte técnico", "F. A. Q."]
+   },
+   {
+      titulo: "Política de retención y eliminación de datos",
+      contenido: `POLÍTICA DE RETENCIÓN Y ELIMINACIÓN DE DATOS
 TechCorp Solutions | Gestión de Datos | Enero 2025
 
 INTRODUCCIÓN
@@ -6611,11 +6611,11 @@ PRIVACIDAD:
 
 Última actualización: Enero 2025
 Próxima revisión: Julio 2025`,
-        categoriasNombres: ["Políticas de la empresa"]
-    },
-    {
-        titulo: "Solución de problemas de sincronización",
-        contenido: `GUÍA DE SOLUCIÓN DE PROBLEMAS DE SINCRONIZACIÓN
+      categoriasNombres: ["Políticas de la empresa"]
+   },
+   {
+      titulo: "Solución de problemas de sincronización",
+      contenido: `GUÍA DE SOLUCIÓN DE PROBLEMAS DE SINCRONIZACIÓN
 TechCorp Solutions | Troubleshooting | Enero 2025
 
 INTRODUCCIÓN
@@ -7085,11 +7085,11 @@ COMUNIDAD:
 - Pregunta a otros usuarios
 
 Última actualización: Enero 2025`,
-        categoriasNombres: ["Soporte técnico"]
-    },
-    {
-        titulo: "Guía de exportación de datos personales",
-        contenido: `GUÍA DE EXPORTACIÓN DE DATOS PERSONALES
+      categoriasNombres: ["Soporte técnico"]
+   },
+   {
+      titulo: "Guía de exportación de datos personales",
+      contenido: `GUÍA DE EXPORTACIÓN DE DATOS PERSONALES
 TechCorp Solutions | Privacidad y Portabilidad | Enero 2025
 
 INTRODUCCIÓN
@@ -7581,209 +7581,209 @@ WEBINARS:
 
 Última actualización: Enero 2025
 Basado en: GDPR, CCPA, y mejores prácticas de privacidad`,
-        categoriasNombres: ["F. A. Q.", "Políticas de la empresa"]
-    }
+      categoriasNombres: ["F. A. Q.", "Políticas de la empresa"]
+   }
 ];
 
 /**
  * Crea los planes en la base de datos si no existen
  */
 async function crearPlanes() {
-    try {
-        console.log("📋 Verificando planes...");
+   try {
+      console.log("📋 Verificando planes...");
 
-        // Verificar si ya existen planes
-        const planExistente = await Plan.findOne({});
-        if (planExistente) {
-            console.log("✅ Los planes ya existen");
-            return;
-        }
+      // Verificar si ya existen planes
+      const planExistente = await Plan.findOne({});
+      if (planExistente) {
+         console.log("✅ Los planes ya existen");
+         return;
+      }
 
-        // Crear Plan Plus
-        const planPlus = new PlanPlus({
-            nombre: "plus",
-            respuestaRestantesIA: 10,
-            interaccionesConDocumentosRestantes: 10
-        });
+      // Crear Plan Plus
+      const planPlus = new PlanPlus({
+         nombre: "plus",
+         respuestaRestantesIA: 10,
+         interaccionesConDocumentosRestantes: 10
+      });
 
-        // Crear Plan Premium
-        const planPremium = new PlanPremium({
-            nombre: "premium"
-        });
+      // Crear Plan Premium
+      const planPremium = new PlanPremium({
+         nombre: "premium"
+      });
 
-        await planPlus.save();
-        await planPremium.save();
+      await planPlus.save();
+      await planPremium.save();
 
-        console.log("✅ Planes Plus y Premium creados exitosamente");
-    } catch (error) {
-        console.error("❌ Error al crear planes:", error);
-        throw error;
-    }
+      console.log("✅ Planes Plus y Premium creados exitosamente");
+   } catch (error) {
+      console.error("❌ Error al crear planes:", error);
+      throw error;
+   }
 }
 
 /**
  * Crea usuarios de prueba con contraseñas hasheadas
  */
 async function crearUsuarios() {
-    try {
-        console.log("👥 Creando usuarios de prueba...");
+   try {
+      console.log("👥 Creando usuarios de prueba...");
 
-        const usuariosCreados = [];
-        const saltRounds = 10;
+      const usuariosCreados = [];
+      const saltRounds = 10;
 
-        for (const userData of usuariosTest) {
-            // Verificar si el usuario ya existe
-            const usuarioExistente = await Usuario.findOne({ email: userData.email });
-            if (usuarioExistente) {
-                console.log(`⚠️  Usuario ${userData.email} ya existe, se omite`);
-                usuariosCreados.push(usuarioExistente);
-                continue;
-            }
+      for (const userData of usuariosTest) {
+         // Verificar si el usuario ya existe
+         const usuarioExistente = await Usuario.findOne({ email: userData.email });
+         if (usuarioExistente) {
+            console.log(`⚠️  Usuario ${userData.email} ya existe, se omite`);
+            usuariosCreados.push(usuarioExistente);
+            continue;
+         }
 
-            // Hashear contraseña
-            const passwordHash = await bcrypt.hash(userData.password, saltRounds);
+         // Hashear contraseña
+         const passwordHash = await bcrypt.hash(userData.password, saltRounds);
 
-            // Obtener el plan correspondiente
-            const plan = await Plan.findOne({ nombre: userData.tipoPlan });
-            if (!plan) {
-                throw new Error(`Plan ${userData.tipoPlan} no encontrado`);
-            }
+         // Obtener el plan correspondiente
+         const plan = await Plan.findOne({ nombre: userData.tipoPlan });
+         if (!plan) {
+            throw new Error(`Plan ${userData.tipoPlan} no encontrado`);
+         }
 
-            // Crear usuario
-            const nuevoUsuario = new Usuario({
-                email: userData.email,
-                password: passwordHash,
-                nombre: userData.nombre,
-                apellido: userData.apellido,
-                plan: plan._id,
-                documentos: [],
-                chats: []
-            });
+         // Crear usuario
+         const nuevoUsuario = new Usuario({
+            email: userData.email,
+            password: passwordHash,
+            nombre: userData.nombre,
+            apellido: userData.apellido,
+            plan: plan._id,
+            documentos: [],
+            chats: []
+         });
 
-            await nuevoUsuario.save();
-            console.log(`✅ Usuario creado: ${userData.email} (Plan: ${userData.tipoPlan})`);
-            usuariosCreados.push(nuevoUsuario);
-        }
+         await nuevoUsuario.save();
+         console.log(`✅ Usuario creado: ${userData.email} (Plan: ${userData.tipoPlan})`);
+         usuariosCreados.push(nuevoUsuario);
+      }
 
-        return usuariosCreados;
-    } catch (error) {
-        console.error("❌ Error al crear usuarios:", error);
-        throw error;
-    }
+      return usuariosCreados;
+   } catch (error) {
+      console.error("❌ Error al crear usuarios:", error);
+      throw error;
+   }
 }
 
 /**
  * Crea documentos de prueba y los asigna a los usuarios
  */
 async function crearDocumentos(usuarios) {
-    try {
-        console.log("📄 Creando documentos de prueba y cargándolos al RAG...");
+   try {
+      console.log("📄 Creando documentos de prueba y cargándolos al RAG...");
 
-        // Obtener todas las categorías existentes
-        const categorias = await Categoria.find({});
-        if (categorias.length === 0) {
-            throw new Error("No hay categorías disponibles. Ejecuta primero el seed.");
-        }
+      // Obtener todas las categorías existentes
+      const categorias = await Categoria.find({});
+      if (categorias.length === 0) {
+         throw new Error("No hay categorías disponibles. Ejecuta primero el seed.");
+      }
 
-        const documentosCreados = [];
-        let docIndex = 0;
+      const documentosCreados = [];
+      let docIndex = 0;
 
-        // Crear 9 documentos por cada usuario
-        for (let i = 0; i < usuarios.length; i++) {
-            const usuario = usuarios[i];
+      // Crear 9 documentos por cada usuario
+      for (let i = 0; i < usuarios.length; i++) {
+         const usuario = usuarios[i];
 
-            for (let j = 0; j < 9; j++) {
-                const docData = documentosTest[docIndex];
+         for (let j = 0; j < 9; j++) {
+            const docData = documentosTest[docIndex];
 
-                // Obtener IDs de las categorías por nombre
-                const categoriasDoc = categorias.filter(cat =>
-                    docData.categoriasNombres.includes(cat.nombre)
-                );
+            // Obtener IDs de las categorías por nombre
+            const categoriasDoc = categorias.filter(cat =>
+               docData.categoriasNombres.includes(cat.nombre)
+            );
 
-                if (categoriasDoc.length === 0) {
-                    console.error(`⚠️  No se encontraron categorías para el documento "${docData.titulo}"`);
-                    docIndex++;
-                    continue;
-                }
-
-                const categoriasIds = categoriasDoc.map(cat => cat._id);
-
-                // Crear documento usando el servicio (que incluye envío al RAG)
-                try {
-                    const nuevoDocumento = await documentoService.createDocumento({
-                        titulo: docData.titulo,
-                        categorias: categoriasIds,
-                        contenido: docData.contenido,
-                        usuario: usuario._id
-                    });
-
-                    documentosCreados.push(nuevoDocumento);
-                    console.log(`✅ Documento creado y enviado al RAG: "${docData.titulo}" para ${usuario.email}`);
-                } catch (error) {
-                    // Si el documento ya existe, lo informamos pero continuamos
-                    if (error.message && error.message.includes('duplicate')) {
-                        console.log(`⚠️  Documento "${docData.titulo}" ya existe, se omite`);
-                    } else {
-                        console.error(`❌ Error al crear documento "${docData.titulo}":`, error.message);
-                    }
-                }
-
-                docIndex++;
+            if (categoriasDoc.length === 0) {
+               console.error(`⚠️  No se encontraron categorías para el documento "${docData.titulo}"`);
+               docIndex++;
+               continue;
             }
-        }
 
-        console.log(`\n✅ Total de documentos creados y enviados al RAG: ${documentosCreados.length}`);
-        return documentosCreados;
-    } catch (error) {
-        console.error("❌ Error al crear documentos:", error);
-        throw error;
-    }
+            const categoriasIds = categoriasDoc.map(cat => cat._id);
+
+            // Crear documento usando el servicio (que incluye envío al RAG)
+            try {
+               const nuevoDocumento = await documentoService.createDocumento({
+                  titulo: docData.titulo,
+                  categorias: categoriasIds,
+                  contenido: docData.contenido,
+                  usuario: usuario._id
+               });
+
+               documentosCreados.push(nuevoDocumento);
+               console.log(`✅ Documento creado y enviado al RAG: "${docData.titulo}" para ${usuario.email}`);
+            } catch (error) {
+               // Si el documento ya existe, lo informamos pero continuamos
+               if (error.message && error.message.includes('duplicate')) {
+                  console.log(`⚠️  Documento "${docData.titulo}" ya existe, se omite`);
+               } else {
+                  console.error(`❌ Error al crear documento "${docData.titulo}":`, error.message);
+               }
+            }
+
+            docIndex++;
+         }
+      }
+
+      console.log(`\n✅ Total de documentos creados y enviados al RAG: ${documentosCreados.length}`);
+      return documentosCreados;
+   } catch (error) {
+      console.error("❌ Error al crear documentos:", error);
+      throw error;
+   }
 }
 
 /**
  * Función principal
  */
 async function cargarDatosTest() {
-    let redisClient = null;
-    try {
-        // Conectar a MongoDB
-        console.log("🔌 Conectando a MongoDB...");
-        await mongoose.connect(process.env.MONGO_URI);
-        console.log("✅ Conexión exitosa a MongoDB");
+   let redisClient = null;
+   try {
+      // Conectar a MongoDB
+      console.log("🔌 Conectando a MongoDB...");
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log("✅ Conexión exitosa a MongoDB");
 
-        // Conectar a Redis (necesario para documento-service)
-        console.log("🔌 Conectando a Redis...");
-        redisClient = await connectRedis();
-        console.log("✅ Conexión exitosa a Redis\n");
+      // Conectar a Redis (necesario para documento-service)
+      console.log("🔌 Conectando a Redis...");
+      redisClient = await connectRedis();
+      console.log("✅ Conexión exitosa a Redis\n");
 
-        // Ejecutar carga de datos
-        await crearPlanes();
-        const usuarios = await crearUsuarios();
-        await crearDocumentos(usuarios);
+      // Ejecutar carga de datos
+      await crearPlanes();
+      const usuarios = await crearUsuarios();
+      await crearDocumentos(usuarios);
 
-        console.log("\n🎉 ¡Carga de datos de prueba completada exitosamente!");
-        console.log("\n📊 Resumen:");
-        console.log("   - Usuarios creados: 3");
-        console.log("   - Documentos creados: 27 (9 por usuario)");
-        console.log("   - Documentos enviados al RAG: ✅");
-        console.log("   - Planes: Plus y Premium");
-        console.log("\n👤 Credenciales de prueba:");
-        usuariosTest.forEach(u => {
-            console.log(`   - ${u.email} / ${u.password} (${u.tipoPlan})`);
-        });
+      console.log("\n🎉 ¡Carga de datos de prueba completada exitosamente!");
+      console.log("\n📊 Resumen:");
+      console.log("   - Usuarios creados: 3");
+      console.log("   - Documentos creados: 27 (9 por usuario)");
+      console.log("   - Documentos enviados al RAG: ✅");
+      console.log("   - Planes: Plus y Premium");
+      console.log("\n👤 Credenciales de prueba:");
+      usuariosTest.forEach(u => {
+         console.log(`   - ${u.email} / ${u.password} (${u.tipoPlan})`);
+      });
 
-    } catch (error) {
-        console.error("\n❌ Error durante la carga de datos:", error);
-        process.exit(1);
-    } finally {
-        // Cerrar conexiones
-        if (redisClient) {
-            await redisClient.quit();
-            console.log("\n🔌 Conexión a Redis cerrada");
-        }
-        await mongoose.connection.close();
-        console.log("🔌 Conexión a MongoDB cerrada");
-    }
+   } catch (error) {
+      console.error("\n❌ Error durante la carga de datos:", error);
+      process.exit(1);
+   } finally {
+      // Cerrar conexiones
+      if (redisClient) {
+         await redisClient.quit();
+         console.log("\n🔌 Conexión a Redis cerrada");
+      }
+      await mongoose.connection.close();
+      console.log("🔌 Conexión a MongoDB cerrada");
+   }
 }
 
 // Ejecutar script
