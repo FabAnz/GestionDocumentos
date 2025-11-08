@@ -1,4 +1,4 @@
-import Documento from "../model/documento.js";
+import Documento, { DocumentoTexto, DocumentoImagen } from "../model/documento.js";
 import { permissionError } from "../errors/403-error.js";
 import { notFoundError } from "../errors/404-error.js";
 import { badRequestError } from "../errors/400-error.js";
@@ -6,8 +6,10 @@ import mongoose from "mongoose";
 
 const documentoRepository = {
 
-    async createDocumento(documentoData) {
-        const documento = new Documento(documentoData);
+    async createDocumento(documentoData, esImagen = false) {
+        // Usar el modelo específico según el tipo de documento
+        const ModeloDocumento = esImagen ? DocumentoImagen : DocumentoTexto;
+        const documento = new ModeloDocumento(documentoData);
         const documentoGuardado = await documento.save();
         return documentoGuardado;
     },
@@ -19,7 +21,7 @@ const documentoRepository = {
                 throw notFoundError("ID de documento inválido");
             }
 
-            const documento = await Documento.findById(idDocumento).populate('categorias');
+            const documento = await Documento.findById(idDocumento).populate('categoria');
             if (!documento) {
                 throw notFoundError("No se encontró el documento");
             }
@@ -34,7 +36,7 @@ const documentoRepository = {
     },
 
     async getAllDocumentos(userId) {
-        const documentos = await Documento.find({ usuario: userId }).populate('categorias');
+        const documentos = await Documento.find({ usuario: userId }).populate('categoria');
         return documentos;
     },
 
@@ -79,7 +81,7 @@ const documentoRepository = {
             }
 
             // Hacer el update solo si tiene permisos
-            const documentoActualizado = await Documento.findByIdAndUpdate(idDocumento, documentoData, { new: true }).populate('categorias');
+            const documentoActualizado = await Documento.findByIdAndUpdate(idDocumento, documentoData, { new: true }).populate('categoria');
             return documentoActualizado;
         } catch (error) {
             throw error;

@@ -1,33 +1,101 @@
 import validationService from "../services/validation-service.js";
 import documentoService from "../services/documento-service.js";
+import fileExtractionService from "../services/file-extraction-service.js";
+import cloudinaryService from "../services/cloudinary-service.js";
+
+const isImageFile = (file) => {
+    const mimeType = file.mimetype;
+    const extension = file.originalname.toLowerCase().substring(
+        file.originalname.lastIndexOf('.')
+    );
+    
+    const imageMimes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const imageExtensions = ['.jpg', '.jpeg', '.png'];
+    
+    return imageMimes.includes(mimeType) || imageExtensions.includes(extension);
+};
 
 export const createDocumento = async (req, res) => {
     try {
-        const { titulo, categorias, contenido } = req.body;
-        const userId = req.user.id;
-
-        // Validar que todas las categorías existen
-        const validacionCategorias = await validationService.validateCategoriasExist(categorias);
-
-        if (!validacionCategorias.isValid) {
+        // Verificar que se recibió un archivo
+        if (!req.file) {
             return res.status(400).json({
-                message: validacionCategorias.message,
-                categoriasValidas: validacionCategorias.categoriasValidas
+                message: "No se recibió ningún archivo"
             });
         }
 
+        // Obtener campos del FormData
+        const { titulo, categoria } = req.body;
+        const userId = req.user.id;
+
+        // Validar que titulo y categoria están presentes (ya validado por Joi, pero por seguridad)
+        if (!titulo || !categoria) {
+            return res.status(400).json({
+                message: "El título y la categoría son obligatorios"
+            });
+        }
+
+        // Validar que la categoría existe
+        const validacionCategoria = await validationService.validateCategoriaExist(categoria);
+
+        if (!validacionCategoria.isValid) {
+            return res.status(400).json({
+                message: validacionCategoria.message
+            });
+        }
+
+        // Detectar tipo de archivo y procesar según corresponda
+        let contenido = "";
+        let cloudinaryUrl = null;
+        const esImagen = isImageFile(req.file);
+
+        if (esImagen) {
+            // Si es imagen, subir a Cloudinary
+            try {
+                cloudinaryUrl = await cloudinaryService.uploadImage(req.file);
+            } catch (error) {
+                return res.status(400).json({
+                    message: `Error al subir imagen a Cloudinary: ${error.message}`
+                });
+            }
+        } else {
+            // Si es archivo de texto (PDF/TXT), extraer texto
+            try {
+                contenido = await fileExtractionService.extractTextFromFile(req.file);
+            } catch (error) {
+                return res.status(400).json({
+                    message: error.message
+                });
+            }
+            
+            // Validar que se extrajo contenido
+            if (!contenido || contenido.trim().length === 0) {
+                return res.status(400).json({
+                    message: "No se pudo extraer contenido del archivo. El archivo puede estar vacío o no contener texto seleccionable."
+                });
+            }
+        }
+        
+        // Crear documento con el contenido extraído
+        // La validación se maneja automáticamente por el schema de Mongoose
+        // Se usa DocumentoTexto o DocumentoImagen según el tipo de archivo
         const documentoData = {
             titulo,
-            categorias,
+            categoria,
             contenido,
             usuario: userId
         };
+        
+        esImagen && (documentoData.urlImagen = cloudinaryUrl);
 
-        const documentoGuardado = await documentoService.createDocumento(documentoData);
+        const documentoGuardado = await documentoService.createDocumento(documentoData, esImagen);
 
         res.status(201).json(documentoGuardado);
 
     } catch (error) {
+        // Los errores de multer ya se manejan en el middleware uploadFile
+        // Este catch maneja otros errores que puedan ocurrir después
+
         // Manejar errores de validación de Mongoose
         if (error.name === 'ValidationError') {
             const errores = Object.values(error.errors).map(err => err.message);
@@ -104,13 +172,12 @@ export const updateDocumento = async (req, res) => {
             });
         }
 
-        // Validar que todas las categorías existen (si se envían)
-        if (data.categorias) {
-            const validacionCategorias = await validationService.validateCategoriasExist(data.categorias);
-            if (!validacionCategorias.isValid) {
+        // Validar que la categoría existe (si se envía)
+        if (data.categoria) {
+            const validacionCategoria = await validationService.validateCategoriaExist(data.categoria);
+            if (!validacionCategoria.isValid) {
                 return res.status(400).json({
-                    message: validacionCategorias.message,
-                    categoriasValidas: validacionCategorias.categoriasValidas
+                    message: validacionCategoria.message
                 });
             }
         }
@@ -118,7 +185,7 @@ export const updateDocumento = async (req, res) => {
         // Construir objeto con solo los campos enviados
         const documentoData = {};
         if (data.titulo) documentoData.titulo = data.titulo;
-        if (data.categorias) documentoData.categorias = data.categorias;
+        if (data.categoria) documentoData.categoria = data.categoria;
         if (data.contenido) documentoData.contenido = data.contenido;
 
         const documentoActualizado = await documentoService.updateDocumento(idDocumento, documentoData, userId);

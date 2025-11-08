@@ -18,18 +18,20 @@ const documentoService = {
 
     async getAllDocumentos(userId) {
         try {
-            const cacheKey = `documentos:usuario:${userId}`;
+            // TODO: Reestablecer redis
+            /* const cacheKey = `documentos:usuario:${userId}`;
 
             // 1. Intentar obtener de caché
             const cachedDocumentos = await getValue(cacheKey);
             if (cachedDocumentos) {
                 return cachedDocumentos;
-            }
+            } */
 
             // 2. Consultar BD
             const documentos = await documentoRepository.getAllDocumentos(userId);
 
-            await setValue(cacheKey, documentos, 3600);
+            // TODO: Reestablecer redis
+            //await setValue(cacheKey, documentos, 3600);
 
             return documentos;
         } catch (error) {
@@ -60,13 +62,13 @@ const documentoService = {
 
     // ============ MÉTODOS DE ESCRITURA (con invalidación de caché) ============
 
-    async createDocumento(documentoData) {
+    async createDocumento(documentoData, esImagen = false) {
         let documento = null;
         let usuario = null;
         try {
             // Crear documento
             usuario = await usuarioRepository.getUserById(documentoData.usuario);
-            documento = await documentoRepository.createDocumento(documentoData);
+            documento = await documentoRepository.createDocumento(documentoData, esImagen);
 
             // Actualizar usuario
             await usuarioRepository.updateUsuario(
@@ -75,11 +77,22 @@ const documentoService = {
             );
 
             // Enviar a RAG
-            await fetchService.post(urlCrearModificar, documento, {
+            const n8nResponse = await fetchService.post(urlCrearModificar, documento, {
                 headers: {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
+
+            // Si es una imagen, actualizar contenido en la base de datos
+            if (esImagen && n8nResponse && n8nResponse.contenido) {
+                await documentoRepository.updateDocumento(
+                    documento._id,
+                    { contenido: n8nResponse.contenido },
+                    documentoData.usuario
+                );
+                // Invalidar caché del documento actualizado
+                await deleteValue(`documento:${documento._id}:usuario:${documentoData.usuario}`);
+            }
 
             // Decrementar interacciones
             if (usuario.plan.nombre === PLAN_TYPE.PLUS) {

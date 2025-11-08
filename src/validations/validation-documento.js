@@ -10,19 +10,18 @@ export const validateCreateDocumento = Joi.object({
             'string.max': 'El título no puede tener más de {{#limit}} caracteres',
             'any.required': 'El título es obligatorio'
         }),
-    categorias: Joi.array()
-        .items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
-        .min(1)
+    categoria: Joi.string()
+        .pattern(/^[0-9a-fA-F]{24}$/)
         .required()
         .messages({
-            'array.base': 'Las categorías deben ser un array',
-            'array.min': 'Debe seleccionar al menos una categoría',
-            'any.required': 'Las categorías son obligatorias',
+            'string.base': 'La categoría debe ser texto',
+            'string.empty': 'La categoría no puede estar vacía',
+            'any.required': 'La categoría es obligatoria',
             'string.pattern.base': 'El ID de categoría debe ser un ObjectId válido'
         }),
     contenido: Joi.string()
         .required()
-        .max(10000)
+        .max(12000000)
         .messages({
             'string.base': 'El contenido debe ser texto',
             'string.empty': 'El contenido no puede estar vacío',
@@ -53,16 +52,15 @@ export const validateUpdateDocumento = Joi.object({
             'string.empty': 'El título no puede estar vacío',
             'string.max': 'El título no puede tener más de {{#limit}} caracteres'
         }),
-    categorias: Joi.array()
-        .items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
-        .min(1)
+    categoria: Joi.string()
+        .pattern(/^[0-9a-fA-F]{24}$/)
         .messages({
-            'array.base': 'Las categorías deben ser un array',
-            'array.min': 'Debe seleccionar al menos una categoría',
+            'string.base': 'La categoría debe ser texto',
+            'string.empty': 'La categoría no puede estar vacía',
             'string.pattern.base': 'El ID de categoría debe ser un ObjectId válido'
         }),
     contenido: Joi.string()
-        .max(10000)
+        .max(12000000)
         .messages({
             'string.base': 'El contenido debe ser texto',
             'string.empty': 'El contenido no puede estar vacío',
@@ -70,4 +68,27 @@ export const validateUpdateDocumento = Joi.object({
         })
 }).min(1).messages({
     'object.min': 'Debe enviar al menos un campo para actualizar'
+});
+
+export const validateCreateDocumentoFromFile = Joi.object({
+    titulo: Joi.string()
+        .required()
+        .max(200)
+        .messages({
+            'string.base': 'El título debe ser texto',
+            'string.empty': 'El título no puede estar vacío',
+            'string.max': 'El título no puede tener más de {{#limit}} caracteres',
+            'any.required': 'El título es obligatorio'
+        }),
+    categoria: Joi.string()
+        .pattern(/^[0-9a-fA-F]{24}$/)
+        .required()
+        .messages({
+            'string.base': 'La categoría debe ser texto',
+            'string.empty': 'La categoría no puede estar vacía',
+            'any.required': 'La categoría es obligatoria',
+            'string.pattern.base': 'El ID de categoría debe ser un ObjectId válido'
+        })
+}).options({
+    presence: "required"
 });
