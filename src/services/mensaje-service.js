@@ -11,6 +11,14 @@ const urlIA = process.env.CHATBOT_URL;
 const n8nToken = process.env.N8N_JWT_TOKEN;
 
 const mensajeService = {
+    async getMensajesPrueba() {
+        try {
+            const mensajes = await mensajeRepository.getMensajesPrueba();
+            return mensajes;
+        } catch (error) {
+            throw error;
+        }
+    },
     async probarChat(idCliente, contenido, userId) {
         let chat = null;
         let mensajeCliente = null;
