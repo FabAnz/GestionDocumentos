@@ -160,7 +160,6 @@ export const getDocumentoById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-//TODO: Implementar la eliminacion de archivos de cloudinary en delete y update, y en los casos de error
 export const updateDocumento = async (req, res) => {
     try {
         const idDocumento = req.params.id;
@@ -199,6 +198,13 @@ export const updateDocumento = async (req, res) => {
 
         let esImagenNueva = null;
         let tieneArchivoNuevo = false;
+        let urlImagenAnterior = null;
+        let cloudinaryUrlNueva = null;
+
+        // Guardar URL de imagen anterior si existe (para eliminarla después si hay cambio de archivo)
+        if (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN && documentoOriginal.urlImagen) {
+            urlImagenAnterior = documentoOriginal.urlImagen;
+        }
 
         // Si hay archivo nuevo, procesarlo
         if (req.file) {
@@ -211,6 +217,7 @@ export const updateDocumento = async (req, res) => {
                 // Si es imagen, subir a Cloudinary
                 try {
                     cloudinaryUrl = await cloudinaryService.uploadImage(req.file);
+                    cloudinaryUrlNueva = cloudinaryUrl;
                     documentoData.urlImagen = cloudinaryUrl;
                 } catch (error) {
                     return res.status(400).json({
@@ -240,15 +247,38 @@ export const updateDocumento = async (req, res) => {
             documentoData.tipo = esImagenNueva ? DOCUMENT_TYPE.IMAGEN : DOCUMENT_TYPE.TEXTO;
         }
 
-        const documentoActualizado = await documentoService.updateDocumento(
-            idDocumento, 
-            documentoData, 
-            userId, 
-            esImagenNueva !== null ? esImagenNueva : (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN),
-            tieneArchivoNuevo
-        );
+        try {
+            const documentoActualizado = await documentoService.updateDocumento(
+                idDocumento, 
+                documentoData, 
+                userId, 
+                esImagenNueva !== null ? esImagenNueva : (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN),
+                tieneArchivoNuevo
+            );
 
-        res.status(200).json(documentoActualizado);
+            // Si hay cambio de archivo y había una imagen anterior, eliminar la imagen anterior de Cloudinary
+            if (tieneArchivoNuevo && urlImagenAnterior) {
+                try {
+                    await cloudinaryService.deleteFileByUrl(urlImagenAnterior);
+                } catch (error) {
+                    // Log del error pero no fallar la operación completa
+                    console.error('Error al eliminar imagen anterior de Cloudinary:', error);
+                }
+            }
+
+            res.status(200).json(documentoActualizado);
+
+        } catch (updateError) {
+            // Si falla la actualización y se subió una nueva imagen, eliminar la nueva imagen de Cloudinary
+            if (cloudinaryUrlNueva) {
+                try {
+                    await cloudinaryService.deleteFileByUrl(cloudinaryUrlNueva);
+                } catch (deleteError) {
+                    console.error('Error al eliminar imagen nueva de Cloudinary tras fallo en actualización:', deleteError);
+                }
+            }
+            throw updateError;
+        }
 
     } catch (error) {
         // Manejar errores de validación de Mongoose
@@ -291,7 +321,23 @@ export const deleteDocumento = async (req, res) => {
     try {
         const idDocumento = req.params.id;
         const userId = req.user.id;
+        
+        // Obtener documento antes de eliminarlo para verificar si tiene imagen
+        const documento = await documentoService.getDocumentoById(idDocumento, userId);
+        
+        // Eliminar documento de la base de datos
         await documentoService.deleteDocumento(idDocumento, userId);
+        
+        // Si el documento tenía una imagen, eliminar de Cloudinary
+        if (documento && documento.tipo === DOCUMENT_TYPE.IMAGEN && documento.urlImagen) {
+            try {
+                await cloudinaryService.deleteFileByUrl(documento.urlImagen);
+            } catch (error) {
+                // Log del error pero no fallar la operación completa
+                console.error('Error al eliminar imagen de Cloudinary:', error);
+            }
+        }
+        
         res.status(204).json();
     } catch (error) {
         if (error.statusCode === 400) {

@@ -66,7 +66,13 @@ const documentoService = {
     async createDocumento(documentoData, esImagen = false) {
         let documento = null;
         let usuario = null;
+        let cloudinaryUrl = null;
         try {
+            // Guardar URL de Cloudinary si es imagen (para poder eliminarla en caso de error)
+            if (esImagen && documentoData.urlImagen) {
+                cloudinaryUrl = documentoData.urlImagen;
+            }
+
             // Crear documento
             usuario = await usuarioRepository.getUserById(documentoData.usuario);
             documento = await documentoRepository.createDocumento(documentoData, esImagen);
@@ -104,6 +110,16 @@ const documentoService = {
 
             return documento;
         } catch (error) {
+            // Si falla la creación y se subió una imagen, eliminar la imagen de Cloudinary
+            if (cloudinaryUrl) {
+                try {
+                    const cloudinaryService = (await import("./cloudinary-service.js")).default;
+                    await cloudinaryService.deleteFileByUrl(cloudinaryUrl);
+                } catch (deleteError) {
+                    console.error('Error al eliminar imagen de Cloudinary tras fallo en creación:', deleteError);
+                }
+            }
+
             // Si falla la actualización del usuario, eliminar el documento creado
             if (documento && documento._id) {
                 try {
@@ -119,10 +135,22 @@ const documentoService = {
     async updateDocumento(idDocumento, documentoData, userId, esImagen = false, tieneArchivoNuevo = false) {
         let documento = null;
         let documentoOriginal = null;
+        let urlImagenAnterior = null;
+        let cloudinaryUrlNueva = null;
         try {
             documentoOriginal = await documentoRepository.getDocumentoById(idDocumento, userId);
             if (!documentoOriginal) {
                 throw badRequestError("No se encontró el documento");
+            }
+
+            // Guardar URL de imagen anterior si se va a reemplazar
+            if (tieneArchivoNuevo && documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN && documentoOriginal.urlImagen) {
+                urlImagenAnterior = documentoOriginal.urlImagen;
+            }
+
+            // Guardar URL de imagen nueva si se está subiendo
+            if (tieneArchivoNuevo && esImagen && documentoData.urlImagen) {
+                cloudinaryUrlNueva = documentoData.urlImagen;
             }
 
             // Si no hay archivo nuevo, mantener contenido y tipo original
@@ -191,6 +219,16 @@ const documentoService = {
 
             return documento;
         } catch (error) {
+            // Si falla la actualización y se subió una nueva imagen, eliminar la nueva imagen de Cloudinary
+            if (cloudinaryUrlNueva) {
+                try {
+                    const cloudinaryService = (await import("./cloudinary-service.js")).default;
+                    await cloudinaryService.deleteFileByUrl(cloudinaryUrlNueva);
+                } catch (deleteError) {
+                    console.error('Error al eliminar imagen nueva de Cloudinary tras fallo en actualización:', deleteError);
+                }
+            }
+
             // Si falla la actualización restaurar el documento original si existe
             if (documentoOriginal && documentoOriginal._id) {
                 try {
