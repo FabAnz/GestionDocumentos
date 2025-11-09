@@ -11,6 +11,7 @@ const documentoRepository = {
         const ModeloDocumento = esImagen ? DocumentoImagen : DocumentoTexto;
         const documento = new ModeloDocumento(documentoData);
         const documentoGuardado = await documento.save();
+        await documentoGuardado.populate('categoria');
         return documentoGuardado;
     },
 

@@ -2,6 +2,7 @@ import validationService from "../services/validation-service.js";
 import documentoService from "../services/documento-service.js";
 import fileExtractionService from "../services/file-extraction-service.js";
 import cloudinaryService from "../services/cloudinary-service.js";
+import DOCUMENT_TYPE from "../constants/document-constant.js";
 
 const isImageFile = (file) => {
     const mimeType = file.mimetype;
@@ -83,6 +84,7 @@ export const createDocumento = async (req, res) => {
             titulo,
             categoria,
             contenido,
+            tipo: esImagen ? DOCUMENT_TYPE.IMAGEN : DOCUMENT_TYPE.TEXTO,
             usuario: userId
         };
         

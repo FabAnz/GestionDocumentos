@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import DOCUMENT_TYPE from "../../constants/document-constant.js";
 
 const documentoBaseSchema = new mongoose.Schema({
     titulo: {
@@ -15,6 +16,14 @@ const documentoBaseSchema = new mongoose.Schema({
         type: String,
         required: false,
         maxlength: [12000000, "El contenido no puede tener más de 12,000,000 caracteres"]
+    },
+    tipo: {
+        type: String,
+        enum: {
+            values: Object.values(DOCUMENT_TYPE),
+            message: "El tipo debe ser uno de los valores válidos: {VALUE}"
+        },
+        required: [true, "El tipo es obligatorio"]
     },
     usuario: {
         type: mongoose.Schema.Types.ObjectId,

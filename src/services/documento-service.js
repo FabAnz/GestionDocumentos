@@ -85,11 +85,8 @@ const documentoService = {
 
             // Si es una imagen, actualizar contenido en la base de datos
             if (esImagen && n8nResponse && n8nResponse.contenido) {
-                await documentoRepository.updateDocumento(
-                    documento._id,
-                    { contenido: n8nResponse.contenido },
-                    documentoData.usuario
-                );
+                documento.contenido = n8nResponse.contenido;
+                await documentoRepository.updateDocumento(documento._id, documento, documentoData.usuario);
                 // Invalidar caché del documento actualizado
                 await deleteValue(`documento:${documento._id}:usuario:${documentoData.usuario}`);
             }
