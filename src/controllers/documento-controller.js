@@ -160,23 +160,31 @@ export const getDocumentoById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
+//TODO: Implementar la eliminacion de archivos de cloudinary en delete y update, y en los casos de error
 export const updateDocumento = async (req, res) => {
     try {
         const idDocumento = req.params.id;
-        const data = req.body;
+        const { titulo, categoria } = req.body;
         const userId = req.user.id;
 
-        // Validar que el body no esté vacío
-        if (!data || Object.keys(data).length === 0) {
+        // Validar que al menos se envíe un campo para actualizar
+        if (!titulo && !categoria && !req.file) {
             return res.status(400).json({
                 message: "Debe enviar al menos un campo para actualizar"
             });
         }
 
+        // Obtener documento original para conocer su tipo
+        const documentoOriginal = await documentoService.getDocumentoById(idDocumento, userId);
+        if (!documentoOriginal) {
+            return res.status(404).json({
+                message: "No se encontró el documento"
+            });
+        }
+
         // Validar que la categoría existe (si se envía)
-        if (data.categoria) {
-            const validacionCategoria = await validationService.validateCategoriaExist(data.categoria);
+        if (categoria) {
+            const validacionCategoria = await validationService.validateCategoriaExist(categoria);
             if (!validacionCategoria.isValid) {
                 return res.status(400).json({
                     message: validacionCategoria.message
@@ -184,13 +192,61 @@ export const updateDocumento = async (req, res) => {
             }
         }
 
-        // Construir objeto con solo los campos enviados
+        // Construir objeto con los datos a actualizar
         const documentoData = {};
-        if (data.titulo) documentoData.titulo = data.titulo;
-        if (data.categoria) documentoData.categoria = data.categoria;
-        if (data.contenido) documentoData.contenido = data.contenido;
+        if (titulo) documentoData.titulo = titulo;
+        if (categoria) documentoData.categoria = categoria;
 
-        const documentoActualizado = await documentoService.updateDocumento(idDocumento, documentoData, userId);
+        let esImagenNueva = null;
+        let tieneArchivoNuevo = false;
+
+        // Si hay archivo nuevo, procesarlo
+        if (req.file) {
+            tieneArchivoNuevo = true;
+            let contenido = "";
+            let cloudinaryUrl = null;
+            esImagenNueva = isImageFile(req.file);
+
+            if (esImagenNueva) {
+                // Si es imagen, subir a Cloudinary
+                try {
+                    cloudinaryUrl = await cloudinaryService.uploadImage(req.file);
+                    documentoData.urlImagen = cloudinaryUrl;
+                } catch (error) {
+                    return res.status(400).json({
+                        message: `Error al subir imagen a Cloudinary: ${error.message}`
+                    });
+                }
+            } else {
+                // Si es archivo de texto (PDF/TXT), extraer texto
+                try {
+                    contenido = await fileExtractionService.extractTextFromFile(req.file);
+                } catch (error) {
+                    return res.status(400).json({
+                        message: error.message
+                    });
+                }
+                
+                // Validar que se extrajo contenido
+                if (!contenido || contenido.trim().length === 0) {
+                    return res.status(400).json({
+                        message: "No se pudo extraer contenido del archivo. El archivo puede estar vacío o no contener texto seleccionable."
+                    });
+                }
+                
+                documentoData.contenido = contenido;
+            }
+            
+            documentoData.tipo = esImagenNueva ? DOCUMENT_TYPE.IMAGEN : DOCUMENT_TYPE.TEXTO;
+        }
+
+        const documentoActualizado = await documentoService.updateDocumento(
+            idDocumento, 
+            documentoData, 
+            userId, 
+            esImagenNueva !== null ? esImagenNueva : (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN),
+            tieneArchivoNuevo
+        );
 
         res.status(200).json(documentoActualizado);
 
