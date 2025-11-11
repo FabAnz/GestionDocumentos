@@ -16,6 +16,17 @@ const categoriaMensajeRepository = {
         }
     },
 
+    async findCategoriaMensajesByUsuario(userId) {
+        try {
+            const categoriaMensajes = await CategoriaMensaje.find({
+                usuario: userId
+            }).populate('categoria');
+            return categoriaMensajes;
+        } catch (error) {
+            throw error;
+        }
+    },
+
     async createCategoriaMensaje(data) {
         try {
             const categoriaMensaje = new CategoriaMensaje(data);
