@@ -4,6 +4,7 @@ import mensajeRepository from "../repositories/mensaje-repository.js";
 import fetchService from "./fetch-service.js";
 import dotenv from "dotenv";
 import usuarioRepository from "../repositories/usuario-repository.js";
+import categoriaMensajeRepository from "../repositories/categoria-mensaje-repository.js";
 
 dotenv.config();
 
@@ -51,14 +52,20 @@ const mensajeService = {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
-            const mensajeIAData = { 
+            const mensajeIAData = {
                 remitente: REMITENTE.IA,
                 contenido: response.output
             };
             mensajeIA = await mensajeRepository.createMensaje(mensajeIAData);
             //actualizar chat con respuesta de IA
             chat = await chatRepository.updateChat(chat._id, { mensajes: [...chat.mensajes, mensajeIA._id] });
-            return mensajeIA;
+
+            //actualizar categoria mensaje
+            let categoriaMensaje = null;
+            if (response.text) {
+                categoriaMensaje = await categoriaMensajeRepository.updateCategoriaMensaje(response.text, userId);
+            }
+            return { categoriaMensaje, mensajeIA };
         } catch (error) {
             throw error;
         }
