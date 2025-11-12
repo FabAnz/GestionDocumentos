@@ -88,11 +88,10 @@ const documentoService = {
                     "Authorization": `Bearer ${n8nToken}`
                 }
             });
-
             // Si es una imagen, actualizar contenido en la base de datos
             if (esImagen && n8nResponse && n8nResponse.contenido) {
                 documento.contenido = n8nResponse.contenido;
-                await documentoRepository.updateDocumento(documento._id, documento, documentoData.usuario);
+                await documentoRepository.updateDocumento(documento._id, documento, documentoData.usuario, esImagen);
                 // Invalidar caché del documento actualizado
                 await deleteValue(`documento:${documento._id}:usuario:${documentoData.usuario}`);
             }
