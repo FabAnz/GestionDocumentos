@@ -1,4 +1,4 @@
-import Documento from "../model/documento.js";
+import Documento, { DocumentoTexto, DocumentoImagen } from "../model/documento.js";
 import { permissionError } from "../errors/403-error.js";
 import { notFoundError } from "../errors/404-error.js";
 import { badRequestError } from "../errors/400-error.js";
@@ -6,9 +6,23 @@ import mongoose from "mongoose";
 
 const documentoRepository = {
 
-    async createDocumento(documentoData) {
-        const documento = new Documento(documentoData);
+    async createDocumento(documentoData, esImagen = false) {
+        // Usar el modelo específico según el tipo de documento
+        const ModeloDocumento = esImagen ? DocumentoImagen : DocumentoTexto;
+        
+        // Si se proporciona un _id explícito (para cambio de tipo), usarlo
+        if (documentoData._id) {
+            const documento = new ModeloDocumento(documentoData);
+            // Guardar con el ID específico
+            await documento.save();
+            await documento.populate('categoria');
+            return documento;
+        }
+        
+        // Crear documento normalmente sin ID específico
+        const documento = new ModeloDocumento(documentoData);
         const documentoGuardado = await documento.save();
+        await documentoGuardado.populate('categoria');
         return documentoGuardado;
     },
 
@@ -19,7 +33,7 @@ const documentoRepository = {
                 throw notFoundError("ID de documento inválido");
             }
 
-            const documento = await Documento.findById(idDocumento).populate('categorias');
+            const documento = await Documento.findById(idDocumento).populate('categoria');
             if (!documento) {
                 throw notFoundError("No se encontró el documento");
             }
@@ -34,7 +48,7 @@ const documentoRepository = {
     },
 
     async getAllDocumentos(userId) {
-        const documentos = await Documento.find({ usuario: userId }).populate('categorias');
+        const documentos = await Documento.find({ usuario: userId }).populate('categoria');
         return documentos;
     },
 
@@ -60,7 +74,7 @@ const documentoRepository = {
         }
     },
 
-    async updateDocumento(idDocumento, documentoData, userId) {
+    async updateDocumento(idDocumento, documentoData, userId, esImagen = false) {
         try {
             if (!documentoData) {
                 throw badRequestError("No se encontró el documento");
@@ -78,8 +92,17 @@ const documentoRepository = {
                 throw permissionError("No tienes permisos para modificar este documento");
             }
 
+            // Si se especifica esImagen, usar el modelo específico para asegurar el tipo correcto
+            if (esImagen !== undefined) {
+                const ModeloDocumento = esImagen ? DocumentoImagen : DocumentoTexto;
+                // Usar el modelo específico para actualizar, preservando el ID
+                documentoData._id = idDocumento;
+                const documentoActualizado = await ModeloDocumento.findByIdAndUpdate(idDocumento, documentoData, { new: true, upsert: false }).populate('categoria');
+                return documentoActualizado;
+            }
+
             // Hacer el update solo si tiene permisos
-            const documentoActualizado = await Documento.findByIdAndUpdate(idDocumento, documentoData, { new: true }).populate('categorias');
+            const documentoActualizado = await Documento.findByIdAndUpdate(idDocumento, documentoData, { new: true }).populate('categoria');
             return documentoActualizado;
         } catch (error) {
             throw error;

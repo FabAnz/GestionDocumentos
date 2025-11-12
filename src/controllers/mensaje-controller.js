@@ -15,3 +15,15 @@ export const probarChat = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 }
+
+export const getMensajesPrueba = async (req, res) => {
+    try {
+        const mensajes = await mensajeService.getMensajesPrueba();
+        if (!mensajes) {
+            return res.status(404).json({ message: "No se encontraron mensajes" });
+        }
+        return res.status(200).json(mensajes);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}

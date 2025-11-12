@@ -1,33 +1,103 @@
 import validationService from "../services/validation-service.js";
 import documentoService from "../services/documento-service.js";
+import fileExtractionService from "../services/file-extraction-service.js";
+import cloudinaryService from "../services/cloudinary-service.js";
+import DOCUMENT_TYPE from "../constants/document-constant.js";
+
+const isImageFile = (file) => {
+    const mimeType = file.mimetype;
+    const extension = file.originalname.toLowerCase().substring(
+        file.originalname.lastIndexOf('.')
+    );
+    
+    const imageMimes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const imageExtensions = ['.jpg', '.jpeg', '.png'];
+    
+    return imageMimes.includes(mimeType) || imageExtensions.includes(extension);
+};
 
 export const createDocumento = async (req, res) => {
     try {
-        const { titulo, categorias, contenido } = req.body;
-        const userId = req.user.id;
-
-        // Validar que todas las categorías existen
-        const validacionCategorias = await validationService.validateCategoriasExist(categorias);
-
-        if (!validacionCategorias.isValid) {
+        // Verificar que se recibió un archivo
+        if (!req.file) {
             return res.status(400).json({
-                message: validacionCategorias.message,
-                categoriasValidas: validacionCategorias.categoriasValidas
+                message: "No se recibió ningún archivo"
             });
         }
 
+        // Obtener campos del FormData
+        const { titulo, categoria } = req.body;
+        const userId = req.user.id;
+
+        // Validar que titulo y categoria están presentes (ya validado por Joi, pero por seguridad)
+        if (!titulo || !categoria) {
+            return res.status(400).json({
+                message: "El título y la categoría son obligatorios"
+            });
+        }
+
+        // Validar que la categoría existe
+        const validacionCategoria = await validationService.validateCategoriaExist(categoria);
+
+        if (!validacionCategoria.isValid) {
+            return res.status(400).json({
+                message: validacionCategoria.message
+            });
+        }
+
+        // Detectar tipo de archivo y procesar según corresponda
+        let contenido = "";
+        let cloudinaryUrl = null;
+        const esImagen = isImageFile(req.file);
+
+        if (esImagen) {
+            // Si es imagen, subir a Cloudinary
+            try {
+                cloudinaryUrl = await cloudinaryService.uploadImage(req.file);
+            } catch (error) {
+                return res.status(400).json({
+                    message: `Error al subir imagen a Cloudinary: ${error.message}`
+                });
+            }
+        } else {
+            // Si es archivo de texto (PDF/TXT), extraer texto
+            try {
+                contenido = await fileExtractionService.extractTextFromFile(req.file);
+            } catch (error) {
+                return res.status(400).json({
+                    message: error.message
+                });
+            }
+            
+            // Validar que se extrajo contenido
+            if (!contenido || contenido.trim().length === 0) {
+                return res.status(400).json({
+                    message: "No se pudo extraer contenido del archivo. El archivo puede estar vacío o no contener texto seleccionable."
+                });
+            }
+        }
+        
+        // Crear documento con el contenido extraído
+        // La validación se maneja automáticamente por el schema de Mongoose
+        // Se usa DocumentoTexto o DocumentoImagen según el tipo de archivo
         const documentoData = {
             titulo,
-            categorias,
+            categoria,
             contenido,
+            tipo: esImagen ? DOCUMENT_TYPE.IMAGEN : DOCUMENT_TYPE.TEXTO,
             usuario: userId
         };
+        
+        esImagen && (documentoData.urlImagen = cloudinaryUrl);
 
-        const documentoGuardado = await documentoService.createDocumento(documentoData);
+        const documentoGuardado = await documentoService.createDocumento(documentoData, esImagen);
 
         res.status(201).json(documentoGuardado);
 
     } catch (error) {
+        // Los errores de multer ya se manejan en el middleware uploadFile
+        // Este catch maneja otros errores que puedan ocurrir después
+
         // Manejar errores de validación de Mongoose
         if (error.name === 'ValidationError') {
             const errores = Object.values(error.errors).map(err => err.message);
@@ -90,40 +160,125 @@ export const getDocumentoById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 export const updateDocumento = async (req, res) => {
     try {
         const idDocumento = req.params.id;
-        const data = req.body;
+        const { titulo, categoria } = req.body;
         const userId = req.user.id;
 
-        // Validar que el body no esté vacío
-        if (!data || Object.keys(data).length === 0) {
+        // Validar que al menos se envíe un campo para actualizar
+        if (!titulo && !categoria && !req.file) {
             return res.status(400).json({
                 message: "Debe enviar al menos un campo para actualizar"
             });
         }
 
-        // Validar que todas las categorías existen (si se envían)
-        if (data.categorias) {
-            const validacionCategorias = await validationService.validateCategoriasExist(data.categorias);
-            if (!validacionCategorias.isValid) {
+        // Obtener documento original para conocer su tipo
+        const documentoOriginal = await documentoService.getDocumentoById(idDocumento, userId);
+        if (!documentoOriginal) {
+            return res.status(404).json({
+                message: "No se encontró el documento"
+            });
+        }
+
+        // Validar que la categoría existe (si se envía)
+        if (categoria) {
+            const validacionCategoria = await validationService.validateCategoriaExist(categoria);
+            if (!validacionCategoria.isValid) {
                 return res.status(400).json({
-                    message: validacionCategorias.message,
-                    categoriasValidas: validacionCategorias.categoriasValidas
+                    message: validacionCategoria.message
                 });
             }
         }
 
-        // Construir objeto con solo los campos enviados
+        // Construir objeto con los datos a actualizar
         const documentoData = {};
-        if (data.titulo) documentoData.titulo = data.titulo;
-        if (data.categorias) documentoData.categorias = data.categorias;
-        if (data.contenido) documentoData.contenido = data.contenido;
+        if (titulo) documentoData.titulo = titulo;
+        if (categoria) documentoData.categoria = categoria;
 
-        const documentoActualizado = await documentoService.updateDocumento(idDocumento, documentoData, userId);
+        let esImagenNueva = null;
+        let tieneArchivoNuevo = false;
+        let urlImagenAnterior = null;
+        let cloudinaryUrlNueva = null;
 
-        res.status(200).json(documentoActualizado);
+        // Guardar URL de imagen anterior si existe (para eliminarla después si hay cambio de archivo)
+        if (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN && documentoOriginal.urlImagen) {
+            urlImagenAnterior = documentoOriginal.urlImagen;
+        }
+
+        // Si hay archivo nuevo, procesarlo
+        if (req.file) {
+            tieneArchivoNuevo = true;
+            let contenido = "";
+            let cloudinaryUrl = null;
+            esImagenNueva = isImageFile(req.file);
+
+            if (esImagenNueva) {
+                // Si es imagen, subir a Cloudinary
+                try {
+                    cloudinaryUrl = await cloudinaryService.uploadImage(req.file);
+                    cloudinaryUrlNueva = cloudinaryUrl;
+                    documentoData.urlImagen = cloudinaryUrl;
+                } catch (error) {
+                    return res.status(400).json({
+                        message: `Error al subir imagen a Cloudinary: ${error.message}`
+                    });
+                }
+            } else {
+                // Si es archivo de texto (PDF/TXT), extraer texto
+                try {
+                    contenido = await fileExtractionService.extractTextFromFile(req.file);
+                } catch (error) {
+                    return res.status(400).json({
+                        message: error.message
+                    });
+                }
+                
+                // Validar que se extrajo contenido
+                if (!contenido || contenido.trim().length === 0) {
+                    return res.status(400).json({
+                        message: "No se pudo extraer contenido del archivo. El archivo puede estar vacío o no contener texto seleccionable."
+                    });
+                }
+                
+                documentoData.contenido = contenido;
+            }
+            
+            documentoData.tipo = esImagenNueva ? DOCUMENT_TYPE.IMAGEN : DOCUMENT_TYPE.TEXTO;
+        }
+
+        try {
+            const documentoActualizado = await documentoService.updateDocumento(
+                idDocumento, 
+                documentoData, 
+                userId, 
+                esImagenNueva !== null ? esImagenNueva : (documentoOriginal.tipo === DOCUMENT_TYPE.IMAGEN),
+                tieneArchivoNuevo
+            );
+
+            // Si hay cambio de archivo y había una imagen anterior, eliminar la imagen anterior de Cloudinary
+            if (tieneArchivoNuevo && urlImagenAnterior) {
+                try {
+                    await cloudinaryService.deleteFileByUrl(urlImagenAnterior);
+                } catch (error) {
+                    // Log del error pero no fallar la operación completa
+                    console.error('Error al eliminar imagen anterior de Cloudinary:', error);
+                }
+            }
+
+            res.status(200).json(documentoActualizado);
+
+        } catch (updateError) {
+            // Si falla la actualización y se subió una nueva imagen, eliminar la nueva imagen de Cloudinary
+            if (cloudinaryUrlNueva) {
+                try {
+                    await cloudinaryService.deleteFileByUrl(cloudinaryUrlNueva);
+                } catch (deleteError) {
+                    console.error('Error al eliminar imagen nueva de Cloudinary tras fallo en actualización:', deleteError);
+                }
+            }
+            throw updateError;
+        }
 
     } catch (error) {
         // Manejar errores de validación de Mongoose
@@ -166,7 +321,23 @@ export const deleteDocumento = async (req, res) => {
     try {
         const idDocumento = req.params.id;
         const userId = req.user.id;
+        
+        // Obtener documento antes de eliminarlo para verificar si tiene imagen
+        const documento = await documentoService.getDocumentoById(idDocumento, userId);
+        
+        // Eliminar documento de la base de datos
         await documentoService.deleteDocumento(idDocumento, userId);
+        
+        // Si el documento tenía una imagen, eliminar de Cloudinary
+        if (documento && documento.tipo === DOCUMENT_TYPE.IMAGEN && documento.urlImagen) {
+            try {
+                await cloudinaryService.deleteFileByUrl(documento.urlImagen);
+            } catch (error) {
+                // Log del error pero no fallar la operación completa
+                console.error('Error al eliminar imagen de Cloudinary:', error);
+            }
+        }
+        
         res.status(204).json();
     } catch (error) {
         if (error.statusCode === 400) {

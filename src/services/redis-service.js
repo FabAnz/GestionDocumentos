@@ -1,4 +1,4 @@
-import { redisClient } from '../config/redis-config.js';
+import { redisClient, ensureRedisConnection, isRedisConnected } from '../config/redis-config.js';
 
 /**
  * Guarda un valor en Redis con tiempo de expiración opcional
@@ -8,6 +8,13 @@ import { redisClient } from '../config/redis-config.js';
  */
 export const setValue = async (key, value, timeExpiration = null) => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            throw new Error('Redis no está conectado');
+        }
+
         const serializedValue = typeof value === 'string' 
             ? value 
             : JSON.stringify(value);
@@ -32,6 +39,14 @@ export const setValue = async (key, value, timeExpiration = null) => {
  */
 export const getValue = async (key) => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            console.warn(`⚠️ Redis no está conectado, devolviendo null para [${key}]`);
+            return null;
+        }
+
         const value = await redisClient.get(key);
         
         if (!value) {
@@ -61,6 +76,13 @@ export const getValue = async (key) => {
  */
 export const deleteValue = async (keys) => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            throw new Error('Redis no está conectado');
+        }
+
         const keysArray = Array.isArray(keys) ? keys : [keys];
         const deleted = await redisClient.del(keysArray);
         console.log(`🗑️ Redis DEL: ${keysArray.join(', ')} - ${deleted} eliminadas`);
@@ -78,6 +100,13 @@ export const deleteValue = async (keys) => {
  */
 export const exists = async (key) => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            return false;
+        }
+
         const result = await redisClient.exists(key);
         return result === 1;
     } catch (error) {
@@ -93,6 +122,13 @@ export const exists = async (key) => {
  */
 export const getTTL = async (key) => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            return -2;
+        }
+
         return await redisClient.ttl(key);
     } catch (error) {
         console.error(`❌ Error al obtener TTL de Redis [${key}]:`, error.message);
@@ -105,6 +141,13 @@ export const getTTL = async (key) => {
  */
 export const flushAll = async () => {
     try {
+        // Verificar y reconectar si es necesario
+        await ensureRedisConnection();
+        
+        if (!isRedisConnected()) {
+            throw new Error('Redis no está conectado');
+        }
+
         await redisClient.flushAll();
         console.log('🧹 Redis: Todas las claves eliminadas');
     } catch (error) {

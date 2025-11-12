@@ -1,32 +1,28 @@
 import categoriaRepository from "../repositories/categoria-repository.js";
 
 const validationService = {
-    async validateCategoriasExist(categoriaIds) {
+    async validateCategoriaExist(categoriaId) {
         try {
-            if (!categoriaIds || categoriaIds.length === 0) {
+            if (!categoriaId) {
                 return {
                     isValid: false,
-                    message: "Las categorías son obligatorias"
+                    message: "La categoría es obligatoria"
                 };
             }
             
-            // Verificar que todas las categorías existen
-            const categoriasExistentes = await categoriaRepository.findCategoriasByIds(categoriaIds);
+            // Verificar que la categoría existe
+            const categoriasExistentes = await categoriaRepository.findCategoriasByIds([categoriaId]);
             
-            if (categoriasExistentes.length !== categoriaIds.length) {
+            if (categoriasExistentes.length === 0) {
                 return {
                     isValid: false,
-                    message: "Una o más categorías no existen",
-                    categoriasValidas: categoriasExistentes.map(cat => ({
-                        id: cat._id,
-                        nombre: cat.nombre
-                    }))
+                    message: "La categoría no existe"
                 };
             }
             
             return {
                 isValid: true,
-                categorias: categoriasExistentes
+                categoria: categoriasExistentes[0]
             };
             
         } catch (error) {

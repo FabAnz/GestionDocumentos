@@ -1,6 +1,6 @@
 import usuarioRepository from "../repositories/usuario-repository.js";
 import planRepository from "../repositories/plan-repository.js";
-import { PLAN_TYPE } from "../constants/plan-constant.js";
+import { PLAN_TYPE, PLAN_LIMITS } from "../constants/plan-constant.js";
 
 
 const usuarioService = {
@@ -15,7 +15,8 @@ const usuarioService = {
             const planData = {
                 nombre: PLAN_TYPE.PLUS,
                 respuestaRestantesIA: 10,
-                interaccionesConDocumentosRestantes: 10,
+                cantidadMaximaDocumentos: PLAN_LIMITS.PLUS.cantidadMaximaDocumentos,
+                interaccionesConDocumentosRestantes: PLAN_LIMITS.PLUS.cantidadMaximaDocumentos,
             }
             const newPlan = await planRepository.createPlanPlus(planData);
 
@@ -62,6 +63,15 @@ const usuarioService = {
                     console.error('Error al eliminar plan tras fallo en upgrade:', deleteError);
                 }
             }
+            throw error;
+        }
+    },
+
+    async getUsuarioPorId(id) {
+        try {
+            const usuario = await usuarioRepository.getUserById(id);
+            return usuario;
+        } catch (error) {
             throw error;
         }
     }
