@@ -11,7 +11,14 @@ export const createUsuario = async (req, res) => {
         const passwordHash = await bcrypt.hash(password, 10);
         usuario.password = passwordHash;
         const nuevoUsuario = await usuarioService.createUsuarioConPlan(usuario);
-        res.status(201).json(nuevoUsuario);
+
+        const token = jwt.sign(
+            { id: nuevoUsuario._id, email: nuevoUsuario.email },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRATION || '1h' }
+        );
+
+        res.status(201).json({ token, usuario: nuevoUsuario });
     } catch (error) {
         // Manejar error de email duplicado
         if (error.code === 11000) {
