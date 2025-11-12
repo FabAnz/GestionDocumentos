@@ -81,3 +81,16 @@ export const upgradePlan = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+export const getUsuarioPorId = async (req, res) => {
+    console.log("req.user.id: ", req.user.id);
+    try {
+        const usuario = await usuarioService.getUsuarioPorId(req.user.id);
+        if (!usuario) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+        res.status(200).json(usuario);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}

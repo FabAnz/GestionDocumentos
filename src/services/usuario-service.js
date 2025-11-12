@@ -65,6 +65,15 @@ const usuarioService = {
             }
             throw error;
         }
+    },
+
+    async getUsuarioPorId(id) {
+        try {
+            const usuario = await usuarioRepository.getUserById(id);
+            return usuario;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 
