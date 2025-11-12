@@ -9,6 +9,9 @@ const categoriasBase = [
     },
     {
         nombre: "Políticas de la empresa"
+    },
+    {
+        nombre: "Productos/Servicios"
     }
 ];
 

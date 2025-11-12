@@ -82,6 +82,7 @@ export const loginUsuario = async (req, res) => {
 
 export const upgradePlan = async (req, res) => {
     try {
+        console.log("req.usuarioCompleto: ", req);
         const updatedUsuario = await usuarioService.upgradePlan(req.usuarioCompleto);
         res.status(200).json(updatedUsuario);
     } catch (error) {
