@@ -87,15 +87,25 @@ let pdfjsLib = null;
 const loadPdfJs = async () => {
     if (!pdfjsLib) {
         try {
+            // Configurar GlobalWorkerOptions ANTES de importar pdfjs-dist
+            // Esto evita que pdfjs-dist intente configurar un worker automáticamente
+            if (typeof globalThis.pdfjsLib === 'undefined') {
+                globalThis.pdfjsLib = {};
+            }
+            if (!globalThis.pdfjsLib.GlobalWorkerOptions) {
+                globalThis.pdfjsLib.GlobalWorkerOptions = {};
+            }
+            globalThis.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
+            
             // Importación dinámica de pdfjs-dist
             // Usar la ruta legacy que es más compatible con serverless
             const pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
             pdfjsLib = pdfjsModule.default || pdfjsModule;
             
-            // Deshabilitar el worker en entornos serverless (Vercel)
-            // Esto evita problemas con workers que no funcionan bien en serverless
+            // Configurar el worker inmediatamente después de importar
             if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
-                pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+                // Establecer workerSrc con una URL CDN válida
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version || '4.0.379'}/pdf.worker.min.mjs`;
             }
         } catch (error) {
             console.error('Error al cargar pdfjs-dist:', error);
@@ -157,6 +167,7 @@ const fileExtractionService = {
             const uint8Array = new Uint8Array(buffer);
             
             // Cargar el documento PDF
+            // Configuración optimizada para serverless sin worker
             const loadingTask = pdfjs.getDocument({
                 data: uint8Array,
                 useSystemFonts: true,
@@ -164,6 +175,9 @@ const fileExtractionService = {
                 // Deshabilitar worker explícitamente para serverless
                 useWorkerFetch: false,
                 isEvalSupported: false,
+                // Forzar modo sin worker
+                disableAutoFetch: false,
+                disableStream: false,
             });
             
             const pdf = await loadingTask.promise;
