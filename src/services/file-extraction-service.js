@@ -1,3 +1,85 @@
+// Polyfills para APIs del navegador necesarias para pdfjs-dist en Node.js/serverless
+// Estos polyfills deben estar antes de importar pdfjs-dist
+if (typeof globalThis.DOMMatrix === 'undefined') {
+    // Polyfill para DOMMatrix - necesario para transformaciones de matriz en PDFs
+    globalThis.DOMMatrix = class DOMMatrix {
+        constructor(init) {
+            if (typeof init === 'string') {
+                // Parsear matriz CSS transform (ej: "matrix(1, 0, 0, 1, 0, 0)")
+                const values = init.match(/matrix\(([^)]+)\)/);
+                if (values) {
+                    const nums = values[1].split(',').map(Number);
+                    this.a = nums[0] || 1;
+                    this.b = nums[1] || 0;
+                    this.c = nums[2] || 0;
+                    this.d = nums[3] || 1;
+                    this.e = nums[4] || 0;
+                    this.f = nums[5] || 0;
+                } else {
+                    this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0;
+                }
+            } else if (init && typeof init === 'object') {
+                this.a = init.a ?? 1;
+                this.b = init.b ?? 0;
+                this.c = init.c ?? 0;
+                this.d = init.d ?? 1;
+                this.e = init.e ?? 0;
+                this.f = init.f ?? 0;
+            } else {
+                this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0;
+            }
+        }
+        multiply(other) {
+            return new DOMMatrix({
+                a: this.a * other.a + this.c * other.b,
+                b: this.b * other.a + this.d * other.b,
+                c: this.a * other.c + this.c * other.d,
+                d: this.b * other.c + this.d * other.d,
+                e: this.a * other.e + this.c * other.f + this.e,
+                f: this.b * other.e + this.d * other.f + this.f
+            });
+        }
+        translate(x, y) {
+            return this.multiply(new DOMMatrix({ a: 1, b: 0, c: 0, d: 1, e: x, f: y }));
+        }
+        scale(x, y) {
+            return this.multiply(new DOMMatrix({ a: x, b: 0, c: 0, d: y, e: 0, f: 0 }));
+        }
+    };
+}
+
+if (typeof globalThis.ImageData === 'undefined') {
+    // Polyfill para ImageData - necesario para procesamiento de imágenes en PDFs
+    globalThis.ImageData = class ImageData {
+        constructor(width, height, data) {
+            this.width = width;
+            this.height = height;
+            this.data = data || new Uint8ClampedArray(width * height * 4);
+        }
+    };
+}
+
+if (typeof globalThis.Path2D === 'undefined') {
+    // Polyfill para Path2D - necesario para dibujar rutas en PDFs
+    globalThis.Path2D = class Path2D {
+        constructor() {
+            this.commands = [];
+        }
+        moveTo(x, y) {
+            this.commands.push({ type: 'moveTo', x, y });
+        }
+        lineTo(x, y) {
+            this.commands.push({ type: 'lineTo', x, y });
+        }
+        rect(x, y, width, height) {
+            this.commands.push({ type: 'rect', x, y, width, height });
+        }
+        arc(x, y, radius, startAngle, endAngle) {
+            this.commands.push({ type: 'arc', x, y, radius, startAngle, endAngle });
+        }
+    };
+}
+
 // Importación dinámica de pdfjs-dist para evitar problemas en serverless
 // Se carga solo cuando se necesita procesar un PDF
 let pdfjsLib = null;
