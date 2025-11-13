@@ -1,15 +1,31 @@
-// Importar pdfjs-dist para parsear PDFs (compatible con serverless)
-import * as pdfjsLib from 'pdfjs-dist';
+// Importación dinámica de pdfjs-dist para evitar problemas en serverless
+// Se carga solo cuando se necesita procesar un PDF
+let pdfjsLib = null;
 
-// Configurar el worker para pdfjs-dist (necesario para serverless)
-// En entornos serverless como Vercel, usar una URL CDN para el worker
-// Alternativamente, podemos deshabilitar el worker si causa problemas
-try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-} catch (error) {
-    // Si hay problemas con el worker, intentar sin worker (modo sincrónico)
-    console.warn('No se pudo configurar el worker de pdfjs-dist, usando modo sin worker');
-}
+const loadPdfJs = async () => {
+    if (!pdfjsLib) {
+        try {
+            // Importación dinámica de pdfjs-dist
+            // Usar la ruta legacy que es más compatible con serverless
+            const pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
+            pdfjsLib = pdfjsModule.default || pdfjsModule;
+            
+            // Deshabilitar el worker en entornos serverless (Vercel)
+            // Esto evita problemas con workers que no funcionan bien en serverless
+            if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = '';
+            }
+        } catch (error) {
+            console.error('Error al cargar pdfjs-dist:', error);
+            throw new Error(`Error al cargar pdfjs-dist: ${error.message}. Asegúrate de que pdfjs-dist esté instalado correctamente.`);
+        }
+        
+        if (!pdfjsLib || typeof pdfjsLib.getDocument !== 'function') {
+            throw new Error('No se pudo cargar pdfjs-dist correctamente. getDocument no está disponible.');
+        }
+    }
+    return pdfjsLib;
+};
 
 const fileExtractionService = {
     /**
@@ -52,14 +68,20 @@ const fileExtractionService = {
      */
     async extractTextFromPDF(buffer) {
         try {
+            // Cargar pdfjs-dist dinámicamente
+            const pdfjs = await loadPdfJs();
+            
             // Convertir Buffer a Uint8Array para pdfjs-dist
             const uint8Array = new Uint8Array(buffer);
             
             // Cargar el documento PDF
-            const loadingTask = pdfjsLib.getDocument({
+            const loadingTask = pdfjs.getDocument({
                 data: uint8Array,
                 useSystemFonts: true,
                 verbosity: 0, // Reducir logs en producción
+                // Deshabilitar worker explícitamente para serverless
+                useWorkerFetch: false,
+                isEvalSupported: false,
             });
             
             const pdf = await loadingTask.promise;
