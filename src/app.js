@@ -20,7 +20,7 @@ await initializeApp();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://gestion-documentos-frontend.vercel.app/"
+        "https://gestion-documentos-frontend.vercel.app"
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
