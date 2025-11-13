@@ -62,7 +62,6 @@ const mensajeService = {
 
             //actualizar categoria mensaje
             let categoriaMensaje = null;
-            //TODO: Hacer que la n8n devuelva un objeto null si no hay categoria
             if (response.text != "null") {
                 categoriaMensaje = await categoriaMensajeRepository.updateCategoriaMensaje(response.text, userId);
             }

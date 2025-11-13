@@ -17,9 +17,11 @@ await initializeApp();
 
 // Configurar CORS para permitir conexiones desde el frontend React
 // IMPORTANTE: CORS debe estar antes de Helmet para evitar conflictos
-// TODO: poner cors de produccion del frontend
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: [
+        "http://localhost:5173",
+        "https://gestion-documentos-frontend.vercel.app/"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
@@ -36,8 +38,7 @@ app.use(express.json());
 //middelware sanitizado
 app.use(xssSanitizer);
 
-// TODO: dejar el limiter
-// app.use(apiLimiter);
+app.use(apiLimiter);
 
 app.use("/api/v1/usuarios", v1UsuarioRoutes);
 app.use("/api/v1/documentos", v1DocumentoRoutes);

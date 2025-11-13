@@ -19,20 +19,18 @@ const documentoService = {
 
     async getAllDocumentos(userId) {
         try {
-            // TODO: Reestablecer redis
-            /* const cacheKey = `documentos:usuario:${userId}`;
+            const cacheKey = `documentos:usuario:${userId}`;
 
             // 1. Intentar obtener de caché
             const cachedDocumentos = await getValue(cacheKey);
             if (cachedDocumentos) {
                 return cachedDocumentos;
-            } */
+            }
 
             // 2. Consultar BD
             const documentos = await documentoRepository.getAllDocumentos(userId);
 
-            // TODO: Reestablecer redis
-            //await setValue(cacheKey, documentos, 3600);
+            await setValue(cacheKey, documentos, 3600);
 
             return documentos;
         } catch (error) {

@@ -10,9 +10,7 @@ import { loginLimiter } from "../../middlewares/rate-limit-middleware.js";
 const routes = express.Router();
 
 routes.post("/registro", validateRequest(validateCreateUsuario, reqValidate.BODY), createUsuario);
-// TODO: dejar el limiter
-// routes.post("/login", loginLimiter, validateRequest(validateLoginUsuario, reqValidate.BODY), loginUsuario);
-routes.post("/login", validateRequest(validateLoginUsuario, reqValidate.BODY), loginUsuario);
+routes.post("/login", loginLimiter, validateRequest(validateLoginUsuario, reqValidate.BODY), loginUsuario);
 routes.get("/usuario", authMiddleware, getUsuarioPorId);
 routes.put("/upgrade-plan", authMiddleware, validateUpgradePlan, upgradePlan);
 
