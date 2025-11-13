@@ -1,56 +1,15 @@
-// pdf-parse es un módulo CommonJS, necesitamos usar createRequire para importarlo
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const pdfParseModule = require('pdf-parse');
+// Importar pdfjs-dist para parsear PDFs (compatible con serverless)
+import * as pdfjsLib from 'pdfjs-dist';
 
-// En pdf-parse 2.4.5, el módulo puede exportar de diferentes formas
-// Crear un wrapper que maneje todas las posibilidades
-const pdfParse = async (buffer, options = {}) => {
-    // Si el módulo es una función directamente, usarla
-    if (typeof pdfParseModule === 'function') {
-        return await pdfParseModule(buffer, options);
-    }
-    
-    // Si tiene PDFParse como clase
-    if (pdfParseModule.PDFParse) {
-        const PDFParseClass = pdfParseModule.PDFParse;
-        try {
-            // Convertir Buffer a Uint8Array si es necesario
-            const uint8Array = buffer instanceof Buffer ? new Uint8Array(buffer) : buffer;
-            
-            // Intentar instanciar la clase
-            const parser = new PDFParseClass(uint8Array, options);
-            // Intentar diferentes métodos comunes
-            if (typeof parser.parse === 'function') {
-                return await parser.parse();
-            }
-            if (typeof parser.getText === 'function') {
-                return await parser.getText();
-            }
-            if (parser.text) {
-                return { text: parser.text };
-            }
-            // Si tiene un método estático
-            if (typeof PDFParseClass.parse === 'function') {
-                return await PDFParseClass.parse(uint8Array, options);
-            }
-        } catch (error) {
-            throw new Error(`Error al procesar PDF con PDFParse: ${error.message}`);
-        }
-    }
-    
-    // Si tiene un método parse directamente en el módulo
-    if (typeof pdfParseModule.parse === 'function') {
-        return await pdfParseModule.parse(buffer, options);
-    }
-    
-    // Último recurso: intentar usar el módulo como función
-    if (typeof pdfParseModule === 'function') {
-        return await pdfParseModule(buffer, options);
-    }
-    
-    throw new Error('No se pudo encontrar la función de parseo en pdf-parse');
-};
+// Configurar el worker para pdfjs-dist (necesario para serverless)
+// En entornos serverless como Vercel, usar una URL CDN para el worker
+// Alternativamente, podemos deshabilitar el worker si causa problemas
+try {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+} catch (error) {
+    // Si hay problemas con el worker, intentar sin worker (modo sincrónico)
+    console.warn('No se pudo configurar el worker de pdfjs-dist, usando modo sin worker');
+}
 
 const fileExtractionService = {
     /**
@@ -87,14 +46,39 @@ const fileExtractionService = {
     },
 
     /**
-     * Extrae texto de un archivo PDF
+     * Extrae texto de un archivo PDF usando pdfjs-dist
      * @param {Buffer} buffer - Buffer del archivo PDF
      * @returns {Promise<string>} Texto extraído del PDF
      */
     async extractTextFromPDF(buffer) {
         try {
-            const data = await pdfParse(buffer);
-            const text = data.text.trim();
+            // Convertir Buffer a Uint8Array para pdfjs-dist
+            const uint8Array = new Uint8Array(buffer);
+            
+            // Cargar el documento PDF
+            const loadingTask = pdfjsLib.getDocument({
+                data: uint8Array,
+                useSystemFonts: true,
+                verbosity: 0, // Reducir logs en producción
+            });
+            
+            const pdf = await loadingTask.promise;
+            let fullText = '';
+
+            // Extraer texto de todas las páginas
+            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const textContent = await page.getTextContent();
+                
+                // Concatenar el texto de la página
+                const pageText = textContent.items
+                    .map(item => item.str)
+                    .join(' ');
+                
+                fullText += pageText + '\n';
+            }
+
+            const text = fullText.trim();
 
             if (!text || text.length === 0) {
                 throw new Error('El PDF no contiene texto seleccionable. Puede contener solo imágenes o estar protegido.');
@@ -102,11 +86,11 @@ const fileExtractionService = {
 
             return text;
         } catch (error) {
-            // Manejar errores específicos de pdf-parse
-            if (error.message.includes('Invalid PDF')) {
+            // Manejar errores específicos de pdfjs-dist
+            if (error.message.includes('Invalid PDF') || error.name === 'InvalidPDFException') {
                 throw new Error('El archivo PDF está corrupto o no es válido');
             }
-            if (error.message.includes('password') || error.message.includes('encrypted')) {
+            if (error.message.includes('password') || error.message.includes('encrypted') || error.name === 'PasswordException') {
                 throw new Error('El PDF está protegido con contraseña y no se puede extraer el texto');
             }
             if (error.message.includes('no contiene texto')) {
