@@ -87,31 +87,26 @@ let pdfjsLib = null;
 const loadPdfJs = async () => {
     if (!pdfjsLib) {
         try {
-            // Configurar GlobalWorkerOptions ANTES de importar pdfjs-dist
-            // Esto evita que pdfjs-dist intente configurar un worker automáticamente
-            if (typeof globalThis.pdfjsLib === 'undefined') {
-                globalThis.pdfjsLib = {};
-            }
-            if (!globalThis.pdfjsLib.GlobalWorkerOptions) {
-                globalThis.pdfjsLib.GlobalWorkerOptions = {};
-            }
-            globalThis.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
-            
-            // Importación dinámica de pdfjs-dist
-            // Usar la ruta legacy que es más compatible con serverless
+            // Asegurar que las GlobalWorkerOptions existan y deshabilitar el worker ANTES de importar
+            globalThis.pdfjsLib ??= {};
+            globalThis.pdfjsLib.GlobalWorkerOptions ??= {};
+            globalThis.pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+            globalThis.pdfjsLib.GlobalWorkerOptions.workerPort = null;
+
+            // Importación dinámica de pdfjs-dist (build legacy ESM)
             const pdfjsModule = await import('pdfjs-dist/legacy/build/pdf.mjs');
             pdfjsLib = pdfjsModule.default || pdfjsModule;
-            
-            // Configurar el worker inmediatamente después de importar
-            if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
-                // Establecer workerSrc con una URL CDN válida
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version || '4.0.379'}/pdf.worker.min.mjs`;
+
+            // Deshabilitar el worker inmediatamente después de importar
+            if (pdfjsLib.GlobalWorkerOptions) {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = null;
+                pdfjsLib.GlobalWorkerOptions.workerPort = null;
             }
         } catch (error) {
             console.error('Error al cargar pdfjs-dist:', error);
             throw new Error(`Error al cargar pdfjs-dist: ${error.message}. Asegúrate de que pdfjs-dist esté instalado correctamente.`);
         }
-        
+
         if (!pdfjsLib || typeof pdfjsLib.getDocument !== 'function') {
             throw new Error('No se pudo cargar pdfjs-dist correctamente. getDocument no está disponible.');
         }
@@ -170,12 +165,11 @@ const fileExtractionService = {
             // Configuración optimizada para serverless sin worker
             const loadingTask = pdfjs.getDocument({
                 data: uint8Array,
+                disableWorker: true,
                 useSystemFonts: true,
                 verbosity: 0, // Reducir logs en producción
-                // Deshabilitar worker explícitamente para serverless
                 useWorkerFetch: false,
                 isEvalSupported: false,
-                // Forzar modo sin worker
                 disableAutoFetch: false,
                 disableStream: false,
             });
